@@ -1,0 +1,862 @@
+/* ===== PC DESIGN ===== */
+// 黑蓝色主题背景
+$containerBgColor: #0a1520;
+$containerBgDark: #050a10;
+
+// 左侧信息区域
+$leftSectionPadding: 100px 80px;
+
+// 右侧登录区域
+$rightSectionBg: #1a2332;
+$rightSectionBorder: #409EFF;
+$rightSectionPadding: 80px 60px;
+
+// 表单样式
+$formWidth: 420px;
+$inputHeight: 50px;
+$buttonHeight: 50px;
+$borderRadius: 10px;
+
+// 文字颜色
+$textWhite: #ffffff;
+$textLight: rgba(255, 255, 255, 0.9);
+$textMuted: rgba(255, 255, 255, 0.65);
+
+// 主色调
+$primaryColor: #409EFF;
+$primaryHover: #66b1ff;
+
+// - - - - - 页面基础设置
+.container {
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background: $containerBgColor;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  // 背景光点效果
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(64, 158, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(64, 158, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(64, 158, 255, 0.08) 0%, transparent 50%);
+    background-size: 100% 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // 主内容容器 - 居中显示
+  .main-content {
+    width: 100%;
+    max-width: 1600px;
+    display: flex;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+  }
+
+  // 左侧信息区域 - 无边框，直接显示在背景上
+  .left-section {
+    width: 50%;
+    padding: $leftSectionPadding;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+
+    .logo-section {
+      margin-bottom: 70px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      .logo-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, rgba(64, 158, 255, 0.15) 0%, rgba(64, 158, 255, 0.08) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border: 2px solid rgba(64, 158, 255, 0.25);
+        overflow: visible;
+        flex-shrink: 0;
+
+        .fish-logo {
+          width: 48px;
+          height: 48px;
+        }
+      }
+
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .platform-title {
+        font-size: 42px;
+        font-weight: 600;
+        color: $textWhite;
+        margin: 0 0 8px 0;
+        line-height: 1.2;
+        letter-spacing: 1px;
+      }
+
+      .platform-subtitle {
+        font-size: 18px;
+        color: $textLight;
+        margin: 0;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .main-heading {
+      margin-bottom: 24px;
+
+      .heading-text {
+        font-size: 28px;
+        font-weight: 400;
+        color: $textLight;
+        margin: 0 0 16px 0;
+      }
+
+      .heading-main {
+        font-size: 48px;
+        font-weight: 600;
+        color: $textWhite;
+        margin: 0;
+        line-height: 1.2;
+        letter-spacing: 1px;
+      }
+    }
+
+    .slogan {
+      font-size: 18px;
+      color: $textMuted;
+      margin: 0 0 80px 0;
+      letter-spacing: 0.5px;
+    }
+
+    .feature-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      .feature-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: $borderRadius;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(64, 158, 255, 0.3);
+          transform: translateX(5px);
+        }
+
+        .feature-icon {
+          width: 56px;
+          height: 56px;
+          background: rgba(64, 158, 255, 0.12);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          border: 1px solid rgba(64, 158, 255, 0.2);
+
+          i {
+            font-size: 28px;
+            color: $primaryColor;
+          }
+
+          &.wave-icon {
+            .wave-svg {
+              width: 32px;
+              height: 24px;
+            }
+          }
+
+          .fish-icon {
+            width: 28px;
+            height: 28px;
+          }
+        }
+
+        .feature-content {
+          flex: 1;
+          padding-top: 4px;
+
+          .feature-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: $textWhite;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.5px;
+          }
+
+          .feature-desc {
+            font-size: 15px;
+            color: $textMuted;
+            margin: 0;
+            line-height: 1.6;
+          }
+        }
+      }
+    }
+  }
+
+  // 右侧登录表单区域 - 有边框
+  .right-section {
+    width: 50%;
+    background: $rightSectionBg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $rightSectionPadding;
+    position: relative;
+    z-index: 1;
+    border: 2px solid $rightSectionBorder;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(64, 158, 255, 0.2);
+
+    .login-form-wrapper {
+      width: 100%;
+      max-width: $formWidth;
+
+      .welcome-section {
+        margin-bottom: 50px;
+
+        .welcome-title {
+          font-size: 36px;
+          font-weight: 600;
+          color: $textWhite;
+          margin: 0 0 12px 0;
+          letter-spacing: 0.5px;
+        }
+
+        .welcome-subtitle {
+          font-size: 16px;
+          color: $textMuted;
+          margin: 0;
+          letter-spacing: 0.3px;
+        }
+      }
+
+      .login-tabs {
+        margin-bottom: 35px;
+
+        :deep(.el-tabs__header) {
+          margin: 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        :deep(.el-tabs__nav-wrap::after) {
+          background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        :deep(.el-tabs__item) {
+          color: $textMuted;
+          font-size: 16px;
+          padding: 0 24px;
+          height: 52px;
+          line-height: 52px;
+          border: none;
+          font-weight: 400;
+          transition: all 0.3s;
+
+          &:hover {
+            color: $textLight;
+          }
+        }
+
+        :deep(.el-tabs__item.is-active) {
+          color: $primaryColor;
+          font-weight: 500;
+        }
+
+        :deep(.el-tabs__active-bar) {
+          background-color: $primaryColor;
+          height: 3px;
+          border-radius: 2px;
+        }
+      }
+
+      .login-form {
+        .el-form-item {
+          margin-bottom: 24px;
+
+          :deep(.el-input__inner) {
+            height: $inputHeight;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: $borderRadius;
+            color: $textWhite;
+            font-size: 15px;
+            padding-left: 50px;
+            transition: all 0.3s;
+
+            &::placeholder {
+              color: $textMuted;
+            }
+
+            &:hover {
+              border-color: rgba(255, 255, 255, 0.25);
+              background: rgba(255, 255, 255, 0.1);
+            }
+
+            &:focus {
+              border-color: $primaryColor;
+              background: rgba(255, 255, 255, 0.12);
+              box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+            }
+          }
+
+          :deep(.el-input__prefix) {
+            left: 18px;
+            color: $textMuted;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .el-input__icon {
+              line-height: 1;
+              font-size: 18px;
+            }
+          }
+
+          :deep(.el-input__suffix) {
+            right: 15px;
+            color: $textMuted;
+
+            .el-input__icon {
+              line-height: $inputHeight;
+              font-size: 18px;
+              cursor: pointer;
+
+              &:hover {
+                color: $textLight;
+              }
+            }
+          }
+
+          :deep(.el-form-item__error) {
+            color: #f56c6c;
+            padding-left: 18px;
+            font-size: 13px;
+            margin-top: 6px;
+          }
+        }
+
+        .form-options {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 35px;
+
+          :deep(.el-checkbox) {
+            .el-checkbox__label {
+              color: $textMuted;
+              font-size: 14px;
+            }
+
+            .el-checkbox__input.is-checked .el-checkbox__inner {
+              background-color: $primaryColor;
+              border-color: $primaryColor;
+            }
+
+            .el-checkbox__inner {
+              background-color: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.2);
+            }
+          }
+
+          .forgot-password {
+            color: $primaryColor;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+
+            &:hover {
+              color: $primaryHover;
+              text-decoration: underline;
+            }
+          }
+        }
+
+        :deep(.el-button--primary) {
+          height: $buttonHeight;
+          background: $primaryColor;
+          border: none;
+          border-radius: $borderRadius;
+          font-size: 16px;
+          font-weight: 500;
+          letter-spacing: 0.5px;
+          transition: all 0.3s;
+
+          &:hover {
+            background: $primaryHover;
+            box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+          }
+
+          &:active {
+            background: darken($primaryColor, 10%);
+          }
+        }
+
+        .download-app {
+          text-align: center;
+          margin-top: 24px;
+
+          span {
+            color: $primaryColor;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover {
+              color: $primaryHover;
+              text-decoration: underline;
+            }
+          }
+        }
+
+        // 短信验证码输入框样式
+        .sms-login-mobile-code-prefix {
+          :deep(.el-input-group__append) {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: none;
+            border-radius: 0 $borderRadius $borderRadius 0;
+
+            .getMobileCode {
+              color: $primaryColor;
+              font-size: 14px;
+              padding: 0 18px;
+              white-space: nowrap;
+              transition: all 0.3s;
+
+              &:hover {
+                color: $primaryHover;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: $textMuted;
+    z-index: 1;
+    opacity: 0.7;
+  }
+}
+
+// - - - - - PC 响应式设置（保持PC端不变）
+@media screen and (max-width: 1200px) {
+  .container {
+    .left-section {
+      padding: 80px 60px;
+    }
+
+    .right-section {
+      padding: 60px 50px;
+    }
+  }
+}
+
+// 平板和小屏幕PC（保持左右布局）
+@media screen and (max-width: 992px) and (min-width: 769px) {
+  .container {
+    .left-section {
+      padding: 60px 40px;
+    }
+
+    .right-section {
+      padding: 50px 40px;
+    }
+  }
+}
+
+// 移动端和平板竖屏（768px以下开始垂直布局）
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    min-height: 100vh;
+    height: auto;
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .main-content {
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .left-section {
+      width: 100%;
+      padding: 30px 20px 20px 20px;
+      min-height: auto;
+      order: 2; // 在移动端，左侧信息区域放在登录表单后面
+
+      .logo-section {
+        margin-bottom: 25px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+
+        .logo-icon {
+          width: 56px;
+          height: 56px;
+          margin-bottom: 0;
+
+          .fish-logo {
+            width: 40px;
+            height: 40px;
+          }
+        }
+
+        .logo-text {
+          align-items: center;
+        }
+
+        .platform-title {
+          font-size: 24px;
+          margin-bottom: 4px;
+        }
+
+        .platform-subtitle {
+          font-size: 13px;
+        }
+      }
+
+      .main-heading {
+        margin-bottom: 15px;
+        text-align: center;
+
+        .heading-text {
+          font-size: 18px;
+          margin-bottom: 8px;
+        }
+
+        .heading-main {
+          font-size: 24px;
+        }
+      }
+
+      .slogan {
+        font-size: 13px;
+        margin-bottom: 25px;
+        text-align: center;
+      }
+
+      .feature-cards {
+        gap: 12px;
+
+        .feature-card {
+          padding: 16px;
+          flex-direction: row;
+          align-items: flex-start;
+          text-align: left;
+
+          .feature-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+
+            i {
+              font-size: 20px;
+            }
+
+            &.wave-icon {
+              .wave-svg {
+                width: 28px;
+                height: 20px;
+              }
+            }
+
+            .fish-icon {
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          .feature-content {
+            padding-top: 2px;
+
+            .feature-title {
+              font-size: 15px;
+              margin-bottom: 6px;
+            }
+
+            .feature-desc {
+              font-size: 12px;
+              line-height: 1.5;
+            }
+          }
+        }
+      }
+    }
+
+    .right-section {
+      width: 100%;
+      padding: 30px 20px;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 2px solid $rightSectionBorder;
+      box-shadow: none;
+      order: 1; // 在移动端，登录表单放在最前面
+
+      .login-form-wrapper {
+        max-width: 100%;
+
+        .welcome-section {
+          margin-bottom: 30px;
+          text-align: center;
+
+          .welcome-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+          }
+
+          .welcome-subtitle {
+            font-size: 13px;
+          }
+        }
+
+        .login-tabs {
+          margin-bottom: 25px;
+
+          :deep(.el-tabs__item) {
+            font-size: 14px;
+            padding: 0 16px;
+            height: 44px;
+            line-height: 44px;
+          }
+        }
+
+        .login-form {
+          .el-form-item {
+            margin-bottom: 18px;
+
+            :deep(.el-input__inner) {
+              height: 44px;
+              font-size: 14px;
+              padding-left: 45px;
+            }
+
+            :deep(.el-input__prefix) {
+              left: 15px;
+
+              .el-input__icon {
+                font-size: 16px;
+              }
+            }
+          }
+
+          .form-options {
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            :deep(.el-checkbox) {
+              .el-checkbox__label {
+                font-size: 13px;
+              }
+            }
+
+            .forgot-password {
+              font-size: 13px;
+            }
+          }
+
+          :deep(.el-button--primary) {
+            height: 44px;
+            font-size: 15px;
+            margin-top: 10px;
+          }
+
+          .download-app {
+            margin-top: 16px;
+
+            span {
+              font-size: 13px;
+            }
+          }
+
+          // 短信验证码输入框在移动端的优化
+          .sms-login-mobile-code-prefix {
+            :deep(.el-input-group__append) {
+              .getMobileCode {
+                font-size: 12px;
+                padding: 0 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .footer {
+      position: relative;
+      bottom: auto;
+      left: auto;
+      transform: none;
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      margin-top: 20px;
+    }
+  }
+}
+
+// 小屏手机优化（480px以下）
+@media screen and (max-width: 480px) {
+  .container {
+    .left-section {
+      padding: 25px 16px 15px 16px;
+
+      .logo-section {
+        margin-bottom: 20px;
+
+        .logo-icon {
+          width: 50px;
+          height: 50px;
+
+          .fish-logo {
+            width: 36px;
+            height: 36px;
+          }
+        }
+
+        .platform-title {
+          font-size: 22px;
+        }
+
+        .platform-subtitle {
+          font-size: 12px;
+        }
+      }
+
+      .main-heading {
+        margin-bottom: 12px;
+
+        .heading-text {
+          font-size: 16px;
+        }
+
+        .heading-main {
+          font-size: 20px;
+        }
+      }
+
+      .slogan {
+        font-size: 12px;
+        margin-bottom: 20px;
+      }
+
+      .feature-cards {
+        gap: 10px;
+
+        .feature-card {
+          padding: 14px;
+
+          .feature-icon {
+            width: 40px;
+            height: 40px;
+
+            i {
+              font-size: 18px;
+            }
+          }
+
+          .feature-content {
+            .feature-title {
+              font-size: 14px;
+              margin-bottom: 4px;
+            }
+
+            .feature-desc {
+              font-size: 11px;
+            }
+          }
+        }
+      }
+    }
+
+    .right-section {
+      padding: 25px 16px;
+
+      .login-form-wrapper {
+        .welcome-section {
+          margin-bottom: 25px;
+
+          .welcome-title {
+            font-size: 22px;
+          }
+
+          .welcome-subtitle {
+            font-size: 12px;
+          }
+        }
+
+        .login-tabs {
+          margin-bottom: 20px;
+
+          :deep(.el-tabs__item) {
+            font-size: 13px;
+            padding: 0 12px;
+            height: 42px;
+            line-height: 42px;
+          }
+        }
+
+        .login-form {
+          .el-form-item {
+            margin-bottom: 16px;
+
+            :deep(.el-input__inner) {
+              height: 42px;
+              font-size: 14px;
+            }
+          }
+
+          :deep(.el-button--primary) {
+            height: 42px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}

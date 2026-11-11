@@ -1,0 +1,16 @@
+{
+  "name": "threshold-settings-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "养殖智能平台 - 阈值设置页 API 服务",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "pmis:bootstrap": "node scripts/bootstrap-pmis.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

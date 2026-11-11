@@ -1,0 +1,106 @@
+#!/bin/bash
+#这里可替换为你自己的执行程序，其他代码无需更改
+ORIGIN_NAME=kbs-server
+profiles_active=dev3
+remote_vm_port=33333
+#java路径配置的位置，需要重新加载
+rebuild_java="source ~/.bash_profile;"
+
+#自动生成的脚本参数
+APP_NAME="${ORIGIN_NAME}-ing.jar"
+#日志中打印的时间字符串
+date_log="$(date +"%Y-%m-%d_%H:%M:%S")"
+#jar包备份字符串
+jar_back_date="$(date +"%Y-%m-%d_%H-%M-%S")"
+#使用说明，用来提示输入参数
+usage() {
+ echo "${date_log}===Usage: sh 脚本名.sh [start|stop|restart|status]"
+ exit 1
+}
+
+#检查程序是否在运行
+is_exist(){
+pid=`ps -ef|grep $APP_NAME|grep -v grep|awk '{print $2}' `
+#如果不存在返回1，存在返回0
+if [ -z "${pid}" ]; then
+return 1
+else
+ return 0
+fi
+}
+
+#启动方法
+start(){
+ echo "${date_log}===jar包的上一个版本为：${ORIGIN_NAME}-last.jar，当前运行jar：${APP_NAME}" | tee -a start.log
+is_exist
+if [ $? -eq "0" ]; then
+ echo "${date_log}===${APP_NAME} is already running. pid=${pid} ." | tee -a start.log
+else
+ #2. 将当前服务的jar和上一版本jar重命名，方便恢复
+ cp "${APP_NAME}" "${ORIGIN_NAME}-last.jar"
+ echo "${date_log}===${APP_NAME}服务的上一个版本jar是：${ORIGIN_NAME}-last.jar" | tee -a start.log
+ temp="back/${ORIGIN_NAME}-${jar_back_date}.jar"
+ mv "${APP_NAME}" "${temp}"
+ echo "${date_log}===${APP_NAME}服务的上一个版本在back中文件名是： ${temp}" | tee -a start.log
+ cp "${ORIGIN_NAME}.jar" "${APP_NAME}"
+ #3. 启动服务
+ eval $rebuild_java
+ nohup java -Dloader.path=./libs -jar -XX:MetaspaceSize=512m -XX:MaxMetaspaceSize=1024m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$remote_vm_port $APP_NAME --spring.profiles.active=$profiles_active > nohup.out 2>&1 &
+ echo "${date_log}===nohup java -Dloader.path=./lib -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$remote_vm_port $APP_NAME --spring.profiles.active=$profiles_active > nohup.out 2>&1 &" | tee -a start.log
+ echo "${date_log}===${APP_NAME} start success, Thank you for using! power by 东芃9394." | tee -a start.log
+fi
+}
+
+#停止方法
+stop(){
+is_exist
+if [ $? -eq "0" ]; then
+ kill $pid
+else
+ echo "${date_log}===${APP_NAME} is not running" | tee -a start.log
+fi
+}
+
+#输出运行状态
+status(){
+is_exist
+if [ $? -eq "0" ]; then
+ echo "${date_log}===${APP_NAME} is running. Pid is ${pid}" | tee -a start.log
+else
+ echo "${date_log}===${APP_NAME} is NOT running." | tee -a start.log
+fi
+}
+
+#重启
+restart(){
+stop
+echo "${date_log}===restart ....." | tee -a start.log
+sleep 3
+start
+}
+
+#根据输入参数，选择执行对应方法，不输入则执行使用说明
+echo "${date_log}================================>start 间隔" >> start.log
+echo "${date_log}================================>power by 东芃9394" >> start.log
+echo "${date_log}================================>start 间隔" >> start.log
+case "$1" in
+"start")
+ start
+ ;;
+"stop")
+ stop
+ ;;
+"status")
+ status
+ ;;
+"restart")
+ restart
+ ;;
+*)
+ usage
+ ;;
+esac
+
+
+ #nohup java -Dloader.path=./libs -jar $APP_NAME -config.spring=./config/application.yml > nohup.out 2>&1 &
+

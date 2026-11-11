@@ -1,0 +1,85 @@
+# OS / IDE
+.DS_Store
+**/.DS_Store
+.idea/
+**/.idea/
+*.iml
+.vscode/
+*.swp
+
+# Nested git backups (keep local Gitee history out of this repo)
+.git.bak-gitee/
+**/.git.bak-gitee/
+
+# Dependencies & build
+**/node_modules/
+**/dist/
+**/target/
+**/.flattened-pom.xml
+*.class
+*.jar
+!**/src/**/lib/*.jar
+
+# Logs & runtime dumps
+*.log
+*.out
+*.err
+**/logs/
+**/yudao-server-log/
+
+# Local / secrets-ish env overrides (keep example if any)
+.env.local.override
+
+# Huge DB dump (exceeds GitHub 100MB limit)
+yudao1.sql
+*.sql.gz
+*.sql.zip
+
+# Patch / temp workspaces
+**/_patch_*/boot-lib/
+**/_patch_*/BOOT-INF/
+
+# Frontend noise
+kede_front_0816_副本/frontend*.err
+kede_front_0816_副本/*.out
+kede_front_0816_副本/BOOT-INF/
+
+# Digital twin deps
+digital-twin/node_modules/
+**/better-sqlite3/
+
+# 本地运行时外置配置（勿入库）
+kd-backend2 2/yudao-server/application-local.yaml
+kede_front_0816_副本/node_modules
+
+# Runtime server dumps / huge logs
+**/*.out
+kd-backend2 2/yudao-server-*.out
+kd-backend2 2/yudao-server-*.log
+
+# Cursor local rules (optional keep out)
+.cursor/
+
+# Bundled side projects — secrets & deps
+ai-xiaoke/**/node_modules/
+ai-xiaoke/**/dist/
+ai-xiaoke/**/.env.local
+rtc_kede/**/node_modules/
+rtc_kede/**/dist/
+rtc_kede/**/stats.html
+rtc_kede/**/*.local
+
+# DB dumps never upload
+*.sql.bak
+kdpmis.sql
+
+# 库表脚本/种子不入库（含示例云密钥；真实 dump 也不传）
+kd-backend2 2/sql/
+**/ruoyi-vue-pro*.sql
+
+# 本地密钥
+**/.env.local
+**/application-local.yaml
+kd-backend2 2/application-local.yaml
+kd-backend2 2/application-local_.yaml
+kd-backend2 2/yudao-server/BOOT-INF/classes/application-local.yaml

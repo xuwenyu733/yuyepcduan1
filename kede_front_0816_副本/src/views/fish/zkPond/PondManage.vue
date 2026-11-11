@@ -1,0 +1,541 @@
+<template>
+    <div class="app-container" style="padding-top: 0;">
+        <doc-alert v-if="false" title="用户体系" url="https://doc.iocoder.cn/user-center/" />
+        <doc-alert v-if="false" title="三方登陆" url="https://doc.iocoder.cn/social-user/" />
+        <doc-alert v-if="false" title="Excel 导入导出" url="https://doc.iocoder.cn/excel-import-and-export/" />
+        <!-- 搜索工作栏 -->
+        <el-row :gutter="20">
+            <!--部门数据-->
+            <el-col :span="4" :xs="24">
+                <div class="app-container">
+                    <div class="head-container" style="padding-bottom: 20px;">
+                        <!-- <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
+                    <el-form-item label="展示类型" prop="currShowType">
+                    </el-form-item>
+                </el-form> -->
+                        <el-select style="width:100%;" v-model="currShowType" placeholder="请选择展示类型" filterable clearable
+                            @change="change_currShowType($event)">
+                            <el-option v-for="(item, index) in showTypeList" :key="item.value + '_showType_' + index"
+                                :label="`${item.label}`" :value="item.value"></el-option>
+                        </el-select>
+                    </div>
+                    <div class="head-container">
+                        <el-input v-model="deptName" placeholder="请输入部门名称" clearable size="small"
+                            prefix-icon="el-icon-search" style="margin-bottom: 20px" />
+                    </div>
+                    <div class="head-container">
+                        <el-tree :data="deptOptions" :props="defaultProps" :expand-on-click-node="false"
+                            :filter-node-method="filterNode" ref="tree" default-expand-all highlight-current
+                            @node-click="handleNodeClick" />
+                    </div>
+                </div>
+            </el-col>
+            <!--用户数据-->
+            <el-col :span="20" :xs="24">
+                <div class="showContent" v-if="currShowType == 1">
+                    <ZkWorkshop ref="ZkWorkshopRef"></ZkWorkshop>
+                </div>
+                <div class="showContent" v-if="currShowType == 2">
+                    <ZkPondSystem ref="ZkPondSystemRef"></ZkPondSystem>
+                </div>
+                <div class="showContent" v-if="currShowType == 3">
+                    <ZkPond ref="ZkPondRef"></ZkPond>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+<script>
+import {
+    addUser,
+    changeUserStatus,
+    delUser,
+    exportUser,
+    getUser,
+    importTemplate,
+    listUser,
+    resetUserPwd,
+    updateUser,
+    delUserList,
+} from "@/api/system/user";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
+import { listSimpleDepts } from "@/api/system/dept";
+import { listSimplePosts } from "@/api/system/post";
+
+import { CommonStatusEnum } from "@/utils/constants";
+import { DICT_TYPE, getDictDatas } from "@/utils/dict";
+import { assignUserRole, listUserRoles } from "@/api/system/permission";
+import { listSimpleRoles } from "@/api/system/role";
+import { getBaseHeader } from "@/utils/request";
+import { resolveCurrentUserDeptId } from "@/utils/siteOptions";
+import ZkPond from "@/views/fish/zkPond/index.vue";
+import ZkPondSystem from "@/views/fish/zkPondSystem/index.vue";
+import ZkWorkshop from "@/views/fish/zkWorkshop/index.vue";
+
+export default {
+    name: "SystemUser",
+    components: {
+        Treeselect,
+        ZkPond,
+        ZkPondSystem,
+        ZkWorkshop,
+    },
+    data() {
+        return {
+            // 遮罩层
+            loading: true,
+            // 导出遮罩层
+            exportLoading: false,
+            // 显示搜索条件
+            showSearch: true,
+            // 总条数
+            total: 0,
+            // 用户表格数据
+            userList: null,
+            // 弹出层标题
+            title: "",
+            // 部门树选项
+            deptOptions: undefined,
+            // 是否显示弹出层
+            open: false,
+            // 部门名称
+            deptName: undefined,
+            // 默认密码
+            initPassword: undefined,
+            // 性别状态字典
+            sexOptions: [],
+            // 岗位选项
+            postOptions: [],
+            // 角色选项
+            roleOptions: [],
+            // 表单参数
+            form: {},
+            defaultProps: {
+                children: "children",
+                label: "name",
+            },
+            // 展示类型，默认存塘
+            showTypeList: [
+                { label: '管理车间', value: 1 },
+                { label: '管理系统', value: 2 },
+                { label: '管理存塘', value: 3 },
+            ],
+            // 当前展示的存塘类型
+            currShowType: 3,
+            // 用户导入参数
+            upload: {
+                // 是否显示弹出层（用户导入）
+                open: false,
+                // 弹出层标题（用户导入）
+                title: "",
+                // 是否禁用上传
+                isUploading: false,
+                // 是否更新已经存在的用户数据
+                updateSupport: 0,
+                // 设置上传的请求头部
+                headers: getBaseHeader(),
+                // 上传的地址
+                url: process.env.VUE_APP_BASE_API + "/admin-api/system/user/import",
+            },
+            // 查询参数
+            queryParams: {
+                pageNo: 1,
+                pageSize: 10,
+                username: undefined,
+                mobile: undefined,
+                status: undefined,
+                deptId: undefined,
+                createTime: [],
+            },
+            // 列信息
+            columns: [
+                { key: 0, label: `用户编号`, visible: true },
+                { key: 1, label: `用户名称`, visible: true },
+                { key: 2, label: `用户昵称`, visible: true },
+                { key: 3, label: `部门`, visible: true },
+                { key: 4, label: `手机号码`, visible: true },
+                { key: 5, label: `状态`, visible: true },
+                { key: 6, label: `创建时间`, visible: true },
+            ],
+            // 表单校验
+            rules: {
+                username: [{ required: true, message: "用户名称不能为空", trigger: "blur" }],
+                nickname: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
+                password: [{ required: true, message: "用户密码不能为空", trigger: "blur" }],
+                email: [
+                    {
+                        type: "email",
+                        message: "'请输入正确的邮箱地址",
+                        trigger: ["blur", "change"],
+                    },
+                ],
+                mobile: [
+                    {
+                        pattern: /^(?:(?:\+|00)86)?1(?:3[\d]|4[5-79]|5[0-35-9]|6[5-7]|7[0-8]|8[\d]|9[189])\d{8}$/,
+                        message: "请输入正确的手机号码",
+                        trigger: "blur",
+                    },
+                ],
+            },
+            // 是否显示弹出层（角色权限）
+            openRole: false,
+
+            // 枚举
+            SysCommonStatusEnum: CommonStatusEnum,
+            // 数据字典
+            statusDictDatas: getDictDatas(DICT_TYPE.COMMON_STATUS),
+            sexDictDatas: getDictDatas(DICT_TYPE.SYSTEM_USER_SEX),
+            // 选中行
+            checkedIds: [],
+        };
+    },
+    watch: {
+        // 根据名称筛选部门树
+        deptName(val) {
+            this.$refs.tree.filter(val);
+        },
+        currShowType() {
+            this.$nextTick(() => this.applyUserDeptScope());
+        },
+    },
+    created() {
+        this.getList();
+        this.getTreeselect();
+        // this.getConfigKey("sys.user.init-password").then(response => {
+        //   this.initPassword = response.msg;
+        // });
+    },
+    mounted() {
+        this.$nextTick(() => this.applyUserDeptScope());
+    },
+    methods: {
+        /** 默认按当前用户归属部门+子部门加载，与各业务模块筛选项一致 */
+        applyUserDeptScope() {
+            const deptId = resolveCurrentUserDeptId();
+            if (deptId == null) return;
+            this.queryParams.deptId = deptId;
+            if (this.currShowType == 1 && this.$refs.ZkWorkshopRef) {
+                this.$refs.ZkWorkshopRef.getListAddDept(deptId);
+            } else if (this.currShowType == 2 && this.$refs.ZkPondSystemRef) {
+                this.$refs.ZkPondSystemRef.getListAddDept(deptId);
+            } else if (this.$refs.ZkPondRef) {
+                this.$refs.ZkPondRef.getListAddDept(deptId);
+            }
+        },
+        change_currShowType(item) {
+            console.log(`change_currShowType===========>`, item);
+        },
+        // 更多操作
+        handleCommand(command, index, row) {
+            switch (command) {
+                case "handleUpdate":
+                    this.handleUpdate(row); //修改客户信息
+                    break;
+                case "handleDelete":
+                    this.handleDelete(row); //红号变更
+                    break;
+                case "handleResetPwd":
+                    this.handleResetPwd(row);
+                    break;
+                case "handleRole":
+                    this.handleRole(row);
+                    break;
+                default:
+                    break;
+            }
+        },
+        /** 查询用户列表 */
+        getList() {
+            this.loading = true;
+            listUser(this.queryParams).then((response) => {
+                this.userList = response.data.list;
+                this.total = response.data.total;
+                this.loading = false;
+            });
+        },
+        /** 查询部门下拉树结构 + 岗位下拉 */
+        getTreeselect() {
+            listSimpleDepts().then((response) => {
+                // 处理 deptOptions 参数
+                this.deptOptions = [];
+                this.deptOptions.push(...this.handleTree(response.data, "id"));
+            });
+            listSimplePosts().then((response) => {
+                // 处理 postOptions 参数
+                this.postOptions = [];
+                this.postOptions.push(...response.data);
+            });
+        },
+        // 筛选节点
+        filterNode(value, data) {
+            if (!value) return true;
+            return data.name.indexOf(value) !== -1;
+        },
+        // 节点单击事件
+        handleNodeClick(data) {
+            this.queryParams.deptId = data.id;
+            if (this.currShowType == 1) {
+                this.$refs.ZkWorkshopRef.getListAddDept(this.queryParams.deptId);
+            } else if (this.currShowType == 2) {
+                this.$refs.ZkPondSystemRef.getListAddDept(this.queryParams.deptId);
+            } else {
+                this.$refs.ZkPondRef.getListAddDept(this.queryParams.deptId);
+            }
+        },
+        // 用户状态修改
+        handleStatusChange(row) {
+            let text = row.status === CommonStatusEnum.ENABLE ? "启用" : "停用";
+            this.$modal
+                .confirm('确认要"' + text + '""' + row.username + '"用户吗?')
+                .then(function () {
+                    return changeUserStatus(row.id, row.status);
+                })
+                .then(() => {
+                    this.$modal.msgSuccess(text + "成功");
+                })
+                .catch(function () {
+                    row.status =
+                        row.status === CommonStatusEnum.ENABLE
+                            ? CommonStatusEnum.DISABLE
+                            : CommonStatusEnum.ENABLE;
+                });
+        },
+        // 取消按钮
+        cancel() {
+            this.open = false;
+            this.reset();
+        },
+        // 取消按钮（角色权限）
+        cancelRole() {
+            this.openRole = false;
+            this.reset();
+        },
+        // 表单重置
+        reset() {
+            this.form = {
+                id: undefined,
+                deptId: undefined,
+                username: undefined,
+                nickname: undefined,
+                password: undefined,
+                mobile: undefined,
+                email: undefined,
+                sex: undefined,
+                status: "0",
+                remark: undefined,
+                postIds: [],
+                roleIds: [],
+            };
+            this.resetForm("form");
+        },
+        /** 搜索按钮操作 */
+        handleQuery() {
+            this.queryParams.pageNo = 1;
+            this.getList();
+        },
+        /** 重置按钮操作 */
+        resetQuery() {
+            this.resetForm("queryForm");
+            this.handleQuery();
+        },
+        /** 新增按钮操作 */
+        handleAdd() {
+            this.reset();
+            // 获得下拉数据
+            this.getTreeselect();
+            // 打开表单，并设置初始化
+            this.open = true;
+            this.title = "添加用户";
+            this.form.password = this.initPassword;
+        },
+        /** 修改按钮操作 */
+        handleUpdate(row) {
+            this.reset();
+            this.getTreeselect();
+            const id = row.id;
+            getUser(id).then((response) => {
+                this.form = response.data;
+                this.open = true;
+                this.title = "修改用户";
+            });
+        },
+        /** 重置密码按钮操作 */
+        handleResetPwd(row) {
+            this.$prompt('请输入"' + row.username + '"的新密码', "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+            })
+                .then(({ value }) => {
+                    resetUserPwd(row.id, value).then((response) => {
+                        this.$modal.msgSuccess("修改成功，新密码是：" + value);
+                    });
+                })
+                .catch(() => { });
+        },
+        /** 分配用户角色操作 */
+        handleRole(row) {
+            this.reset();
+            const id = row.id;
+            // 处理了 form 的用户 username 和 nickname 的展示
+            this.form.id = id;
+            this.form.username = row.username;
+            this.form.nickname = row.nickname;
+            // 打开弹窗
+            this.openRole = true;
+            // 获得角色列表
+            listSimpleRoles().then((response) => {
+                // 处理 roleOptions 参数
+                this.roleOptions = [];
+                this.roleOptions.push(...response.data);
+            });
+            // 获得角色拥有的菜单集合
+            listUserRoles(id).then((response) => {
+                // 设置选中
+                this.form.roleIds = response.data;
+            });
+        },
+        /** 提交按钮 */
+        submitForm: function () {
+            this.$refs["form"].validate((valid) => {
+                if (valid) {
+                    if (this.form.id !== undefined) {
+                        updateUser(this.form).then((response) => {
+                            this.$modal.msgSuccess("修改成功");
+                            this.open = false;
+                            this.getList();
+                        });
+                    } else {
+                        addUser(this.form).then((response) => {
+                            this.$modal.msgSuccess("新增成功");
+                            this.open = false;
+                            this.getList();
+                        });
+                    }
+                }
+            });
+        },
+        /** 提交按钮（角色权限） */
+        submitRole: function () {
+            if (this.form.id !== undefined) {
+                assignUserRole({
+                    userId: this.form.id,
+                    roleIds: this.form.roleIds,
+                }).then((response) => {
+                    this.$modal.msgSuccess("分配角色成功");
+                    this.openRole = false;
+                    this.getList();
+                });
+            }
+        },
+        /** 删除按钮操作 */
+        handleDelete(row) {
+            this.$modal
+                .confirm('是否确认删除用户编号为"' + row.id + '"的数据项?')
+                .then(() => {
+                    //红号变更
+                    return delUser(row.id);
+                })
+                .then(() => {
+                    this.getList();
+                    this.$modal.msgSuccess("删除成功");
+                })
+                .catch(() => { });
+        },
+        /** 导出按钮操作 */
+        handleExport() {
+            this.$modal
+                .confirm("是否确认导出所有用户数据项?")
+                .then(() => {
+                    // 处理查询参数
+                    let params = { ...this.queryParams };
+                    params.pageNo = undefined;
+                    params.pageSize = undefined;
+                    this.exportLoading = true;
+                    return exportUser(params);
+                })
+                .then((response) => {
+                    this.$download.excel(response, "用户数据.xls");
+                })
+                .finally(() => {
+                    this.exportLoading = false;
+                });
+        },
+        /** 导入按钮操作 */
+        handleImport() {
+            this.upload.title = "用户导入";
+            this.upload.open = true;
+        },
+        /** 下载模板操作 */
+        importTemplate() {
+            importTemplate().then((response) => {
+                this.$download.excel(response, "用户导入模板.xls");
+            });
+        },
+        // 文件上传中处理
+        handleFileUploadProgress(event, file, fileList) {
+            this.upload.isUploading = true;
+        },
+        // 文件上传成功处理
+        handleFileSuccess(response, file, fileList) {
+            if (response.code !== 0) {
+                this.$modal.msgError(response.msg);
+                return;
+            }
+            this.upload.open = false;
+            this.upload.isUploading = false;
+            this.$refs.upload.clearFiles();
+            // 拼接提示语
+            let data = response.data;
+            let text = "创建成功数量：" + data.createUsernames.length;
+            for (const username of data.createUsernames) {
+                text += "<br />&nbsp;&nbsp;&nbsp;&nbsp;" + username;
+            }
+            text += "<br />更新成功数量：" + data.updateUsernames.length;
+            for (const username of data.updateUsernames) {
+                text += "<br />&nbsp;&nbsp;&nbsp;&nbsp;" + username;
+            }
+            text += "<br />更新失败数量：" + Object.keys(data.failureUsernames).length;
+            for (const username in data.failureUsernames) {
+                text +=
+                    "<br />&nbsp;&nbsp;&nbsp;&nbsp;" +
+                    username +
+                    "：" +
+                    data.failureUsernames[username];
+            }
+            this.$alert(text, "导入结果", { dangerouslyUseHTMLString: true });
+            this.getList();
+        },
+        // 提交上传文件
+        submitFileForm() {
+            this.$refs.upload.submit();
+        },
+        // 格式化部门的下拉框
+        normalizer(node) {
+            return {
+                id: node.id,
+                label: node.name,
+                children: node.children,
+            };
+        },
+        /** 批量删除操作 */
+        async handleDeleteBatch() {
+            await this.$modal.confirm("是否确认批量删除选中的用户数据?");
+            try {
+                await delUserList(this.checkedIds);
+                this.checkedIds = [];
+                this.checkedIds = [];
+                await this.getList();
+                this.$modal.msgSuccess("批量删除成功");
+            } catch { }
+        },
+        /** 选择行数据 */
+        handleRowCheckboxChange(records) {
+            // 过滤掉 id 为 1 的用户（系统管理员）
+            this.checkedIds = records.filter((item) => item.id !== 1).map((item) => item.id);
+        },
+    },
+};
+</script>

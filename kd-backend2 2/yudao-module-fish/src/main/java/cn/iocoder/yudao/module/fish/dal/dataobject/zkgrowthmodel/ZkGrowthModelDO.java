@@ -1,0 +1,96 @@
+package cn.iocoder.yudao.module.fish.dal.dataobject.zkgrowthmodel;
+
+import lombok.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.*;
+import cn.iocoder.yudao.framework.mybatis.core.dataobject.BaseDO;
+
+/**
+ * 生长模型 DO
+ *
+ * @author 系统管理员
+ */
+@TableName("zk_growth_model")
+@KeySequence("zk_growth_model_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ZkGrowthModelDO extends BaseDO {
+
+    /**
+     * 编号
+     */
+    @TableId
+    private Long id;
+    /**
+     * 所属车间id
+     */
+    private Long workshopId;
+    /**
+     * 车间名称
+     */
+    private String workshopName;
+    /**
+     * 所属系统id
+     */
+    private Long pondSystemId;
+    /**
+     * 存塘系统编号
+     */
+    private String pondNum;
+    /**
+     * 存塘系统名称
+     */
+    private String pondSystemName;
+    /**
+     * 所属存塘id
+     */
+    private Long pondId;
+    /**
+     * 存塘编号
+     */
+    private String pondDetailNum;
+    /**
+     * 存塘名称
+     */
+    private String pondName;
+    /**
+     * 批次编号
+     */
+    private String batchNumber;
+    /**
+     * 平均长度
+     */
+    private Integer averageLength;
+    /**
+     * 平均体重
+     */
+    private Integer averageWeight;
+    /**
+     * 增长速度
+     */
+    private Integer growthRate;
+    /**
+     * 规格
+     */
+    private Integer specification;
+    /**
+     * 负责人id
+     */
+    private Long userId;
+    /**
+     * 所属部门
+     */
+    private Long deptId;
+    private Long tenantId;
+    /**
+     * 文件id
+     */
+    private String fid;
+
+}

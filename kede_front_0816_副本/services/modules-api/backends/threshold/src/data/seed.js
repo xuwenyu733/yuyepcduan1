@@ -1,0 +1,267 @@
+/**
+ * 阈值参数全局配置 - 默认种子（对齐 Figma 12 模块）
+ */
+module.exports = {
+  meta: {
+    version: 'v3.3.0',
+    lastSaved: '2026-07-07',
+    moduleCount: 12
+  },
+  water: {
+    speciesTemps: [
+      { species: '大西洋鲑', warnLow: 10, warnHigh: 16, criticalLow: 8, criticalHigh: 18, enabled: true },
+      { species: '虹鳟', warnLow: 8, warnHigh: 14, criticalLow: 6, criticalHigh: 16, enabled: true },
+      { species: '加州鲈', warnLow: 22, warnHigh: 28, criticalLow: 20, criticalHigh: 32, enabled: true },
+      { species: '鲤鱼', warnLow: 18, warnHigh: 28, criticalLow: 15, criticalHigh: 32, enabled: true },
+      { species: '海参', warnLow: 10, warnHigh: 18, criticalLow: 8, criticalHigh: 22, enabled: true }
+    ],
+    tempDiff: { value: 0.8, unit: '℃', enabled: true, desc: '任意两池温差超过阈值触发报警' },
+    doLevels: { normal: 5, warn: 4, highRisk: 3, emergency: 2, unit: 'mg/L' },
+    nh3: {
+      enabled: true,
+      levels: [
+        { label: '安全', desc: '≤ 此值安全', value: 0.2, color: 'green' },
+        { label: '警戒', desc: '安全值 ~ 警戒值', value: 0.4, color: 'orange' },
+        { label: '危险', desc: '> 警戒值危险', value: 0.4, color: 'red' }
+      ],
+      unit: 'mg/L'
+    },
+    no2: {
+      enabled: true,
+      levels: [
+        { label: '安全', desc: '≤ 此值安全', value: 0.2, color: 'green' },
+        { label: '警戒', desc: '安全值 ~ 警戒值', value: 0.5, color: 'orange' },
+        { label: '危险', desc: '> 警戒值危险', value: 0.5, color: 'red' }
+      ],
+      unit: 'mg/L'
+    },
+    metrics: [
+      { id: 'orp', name: 'ORP 氧化还原电位', unit: 'mV', warnLow: 200, warnHigh: 600, criticalLow: 100, criticalHigh: 700, enabled: true, step: 5 },
+      { id: 'alk', name: '碱度', unit: 'mg/L CaCO₃', warnLow: 80, warnHigh: 250, criticalLow: 50, criticalHigh: 350, enabled: true, step: 5 },
+      { id: 'hard', name: '硬度', unit: 'mg/L CaCO₃', warnLow: 100, warnHigh: 300, criticalLow: 50, criticalHigh: 400, enabled: true, step: 5 },
+      { id: 'co2', name: '二氧化碳 CO₂', unit: 'mg/L', warnLow: 0, warnHigh: 15, criticalLow: 0, criticalHigh: 25, enabled: true, step: 0.5 },
+      { id: 'tp', name: '总磷 TP', unit: 'mg/L', warnLow: 0, warnHigh: 1, criticalLow: 0, criticalHigh: 2, enabled: true, step: 0.1 },
+      { id: 'tn', name: '总氮 TN', unit: 'mg/L', warnLow: 0, warnHigh: 10, criticalLow: 0, criticalHigh: 20, enabled: true, step: 0.5 },
+      { id: 'gsm', name: '土臭素 GSM', unit: 'ng/L', warnLow: 0, warnHigh: 10, criticalLow: 0, criticalHigh: 20, enabled: true, step: 1 },
+      { id: 'mib', name: '2-MIB 异味物质', unit: 'ng/L', warnLow: 0, warnHigh: 10, criticalLow: 0, criticalHigh: 20, enabled: true, step: 1 },
+      { id: 'ph', name: 'pH 值', unit: '', warnLow: 7.0, warnHigh: 8.0, criticalLow: 6.5, criticalHigh: 8.5, enabled: true, step: 0.1 },
+      { id: 'no3', name: '硝酸盐', unit: 'mg/L', warnLow: 0, warnHigh: 35, criticalLow: 0, criticalHigh: 50, enabled: true, step: 1 },
+      { id: 'tss', name: '浊度 TSS', unit: 'mg/L', warnLow: 0, warnHigh: 20, criticalLow: 0, criticalHigh: 40, enabled: true, step: 1 }
+    ]
+  },
+  device: {
+    power: [
+      { id: 'aerator_power', name: '增氧机功率', unit: 'kW', warnLow: 1, warnHigh: 30, criticalLow: 0.5, criticalHigh: 40.5, enabled: true, step: 0.5 },
+      { id: 'pump_flow', name: '水泵流量', unit: 'm³/h', warnLow: 20, warnHigh: 300, criticalLow: 10, criticalHigh: 400, enabled: true, step: 5 },
+      { id: 'blower', name: '鼓风机压力', unit: 'Pa', warnLow: 1000, warnHigh: 6000, criticalLow: 500, criticalHigh: 8000, enabled: true, step: 50 }
+    ],
+    pipeline: [
+      { id: 'pipe', name: '循环管道压力', unit: 'MPa', warnLow: 0.21, warnHigh: 0.7, criticalLow: 0.1, criticalHigh: 0.8, enabled: true, step: 0.01 },
+      { id: 'filter', name: '过滤器压差', unit: 'kPa', warnLow: 10, warnHigh: 80, criticalLow: 0, criticalHigh: 119, enabled: true, step: 1 },
+      { id: 'backwash', name: '微滤机反冲洗频次', unit: '次/天', warnLow: 2, warnHigh: 20, criticalLow: 1, criticalHigh: 30, enabled: true, step: 1, desc: '过高或过低均触发预警' },
+      { id: 'aerator_valve', name: '增氧电磁阀启停频次', unit: '次/h', warnLow: 2, warnHigh: 20, criticalLow: 1, criticalHigh: 30, enabled: true, step: 1 },
+      { id: 'co2_hours', name: 'CO₂脱气运行时长', unit: 'h/天', warnLow: 1.5, warnHigh: 18, criticalLow: 0.5, criticalHigh: 22.5, enabled: true, step: 0.5 }
+    ],
+    electric: [
+      { id: 'voltage', name: '电源电压', unit: 'V', warnLow: 200, warnHigh: 240, criticalLow: 191, criticalHigh: 250, enabled: true, step: 1 },
+      { id: 'current', name: '设备电流', unit: 'A', warnLow: 5, warnHigh: 100, criticalLow: 2, criticalHigh: 150, enabled: true, step: 1 },
+      { id: 'freq', name: '运行频率', unit: 'Hz', warnLow: 10, warnHigh: 50, criticalLow: 5, criticalHigh: 55, enabled: true, step: 0.5 },
+      { id: 'uv', name: '紫外线强度', unit: 'mW/cm²', warnLow: 20, warnHigh: 80, criticalLow: 15, criticalHigh: 95, enabled: true, step: 1 }
+    ],
+    levels: [
+      { id: 'pump', name: '水泵池液位', unit: 'm', warnLow: 0.5, warnHigh: 3.5, criticalLow: 0.3, criticalHigh: 4.5, enabled: true, step: 0.05 },
+      { id: 'fixed', name: '固定床液位', unit: 'm', warnLow: 1, warnHigh: 4, criticalLow: 0.5, criticalHigh: 4.5, enabled: true, step: 0.05 },
+      { id: 'mbbr', name: '移动床液位', unit: 'm', warnLow: 1, warnHigh: 4, criticalLow: 0.5, criticalHigh: 4.5, enabled: true, step: 0.05 }
+    ],
+    maintain: [
+      { id: 'fault_month', name: '月度故障次数', unit: '次/月', warnLow: 0, warnHigh: 3, criticalLow: 0, criticalHigh: 5, enabled: true, step: 1 },
+      { id: 'energy_mom', name: '单设备能耗环比波动', unit: '%', warnLow: -30, warnHigh: 30, criticalLow: -52, criticalHigh: 52, enabled: true, step: 1, desc: '偏差超阈值触发能耗异常告警' },
+      { id: 'stop_hours', name: '连续停机时长', unit: 'min', warnLow: 0, warnHigh: 30, criticalLow: 0, criticalHigh: 60, enabled: true, step: 5 }
+    ]
+  },
+  mortality: {
+    specs: [
+      { spec: '0 - 1g', rate: 0.1, trendRise: 10, dailyCount: 100, enabled: true },
+      { spec: '1 - 5g', rate: 0.1, trendRise: 10, dailyCount: 30, enabled: true },
+      { spec: '5 - 25g', rate: 0.1, trendRise: 10, dailyCount: 20, enabled: true },
+      { spec: '25 - 250g', rate: 0.1, trendRise: 10, dailyCount: 10, enabled: true },
+      { spec: '250 - 1000g', rate: 0.1, trendRise: 10, dailyCount: 8, enabled: true },
+      { spec: '1000g 以上', rate: 0.1, trendRise: 10, dailyCount: 5, enabled: true }
+    ],
+    pond7day: { value: 0.5, unit: '%', enabled: true, desc: '单池7日累计死亡率超过阈值告警' },
+    factoryAvg: { value: 0.3, unit: '%', enabled: true, desc: '全场所有鱼池平均死亡率超过阈值' }
+  },
+  health: {
+    grades: [
+      { label: '优秀', range: '≥ 95 分', color: 'green', action: '正常维护', min: 95 },
+      { label: '关注', range: '85~94 分', color: 'yellow', action: '密切监测', min: 85, max: 94 },
+      { label: '高风险介入', range: '< 85 分', color: 'red', action: '立即介入', max: 84 }
+    ],
+    layers: [
+      { id: 'env', name: '外部环境层', full: 20, warn: 16, enabled: true, desc: '水质、温度、溶氧等环境指标' },
+      { id: 'appearance', name: '外观行为层', full: 60, warn: 48, enabled: true, desc: '摄食、体表、游动、死亡异常' },
+      { id: 'internal', name: '内部肌体层', full: 20, warn: 16, enabled: true, desc: '脏器、肌肉、血液等内部指标' }
+    ]
+  },
+  feeding: {
+    baseRates: [
+      { spec: '9朝', approx: '≈3g', rate: 3.5, enabled: true },
+      { spec: '9.5朝', approx: '≈5g', rate: 3.2, enabled: true },
+      { spec: '10朝', approx: '≈7g', rate: 3.0, enabled: true },
+      { spec: '10.5朝', approx: '≈8.5g', rate: 2.8, enabled: true },
+      { spec: '11朝', approx: '≈12g', rate: 2.5, enabled: true },
+      { spec: '11.5朝', approx: '≈15g', rate: 2.2, enabled: true },
+      { spec: '12朝', approx: '≈20g', rate: 2.0, enabled: true },
+      { spec: '1两', approx: '≈50g', rate: 2.3, enabled: true },
+      { spec: '2两', approx: '≈100g', rate: 2.0, enabled: true },
+      { spec: '4两', approx: '≈200g', rate: 1.8, enabled: true },
+      { spec: '8两', approx: '≈400g', rate: 1.5, enabled: true }
+    ],
+    tempFactors: [
+      { range: '16-22℃', label: '低温', factor: 0.7 },
+      { range: '22-28℃', label: '适温', factor: 1.0 },
+      { range: '28-32℃', label: '高温', factor: 0.6 }
+    ],
+    mealFreq: [
+      { range: '< 50g', min: 4, max: 6, enabled: true },
+      { range: '50-200g', min: 3, max: 4, enabled: true },
+      { range: '> 200g', min: 2, max: 3, enabled: true }
+    ],
+    feedDev: {
+      value: 100,
+      unit: '%',
+      enabled: true,
+      desc: '实际投喂与AI推荐量偏差超阈值高亮预警'
+    },
+    fcr: {
+      target: 1.35,
+      min: 1.2,
+      max: 1.5,
+      desc: '加州鲈标准 1.2~1.5，超出上限预警'
+    },
+    growth: {
+      dailyGainMin: 0.5,
+      sgrMin: 0.8,
+      modelDevMax: 15,
+      desc: '实测与AI预测曲线偏差过大触发长势预警'
+    },
+    behavior: [
+      { label: '快速摄食 · 5-10 分钟吃完', color: 'green' },
+      { label: '缓慢摄食 · 10-15 分钟吃完', color: 'yellow' },
+      { label: '残饵较多 · 15 分钟后仍有残饵', color: 'orange' },
+      { label: '完全不摄食 · 投喂后无摄食行为', color: 'red' }
+    ]
+  },
+  alarm: {
+    overdue: [
+      { level: '紧急', minutes: 15, color: 'red', desc: '立即处理，超时弹窗提醒' },
+      { level: '优先', minutes: 60, color: 'orange', desc: '优先处理，超时升级告警' },
+      { level: '日常', minutes: 240, color: 'blue', desc: '计划处理，超时记录' }
+    ],
+    dense: {
+      count: 5,
+      window: 30,
+      enabled: true,
+      desc: '同区域同类报警短时间密集触发，判定系统性风险'
+    },
+    multi: {
+      value: 3,
+      enabled: true,
+      desc: '同一鱼池同时异常的指标数达到阈值，判定最高优先级'
+    },
+    peakHours: {
+      startHour: 14,
+      endHour: 16,
+      maxCount: 10,
+      enabled: true,
+      desc: '特定时段内告警频次超阈值，启动时段预警分析'
+    }
+  },
+  energy: {
+    items: [
+      { id: 'mom', name: '月度总能耗环比波动上限', value: 20, unit: '%', desc: '月度环比变化超过阈值触发告警' },
+      { id: 'share', name: '单类设备能耗占比上限', value: 40, unit: '%', desc: '单类设备占总能耗超过阈值预警' },
+      { id: 'deviceMom', name: '单设备能耗环比波动上限', value: 30, unit: '%', desc: '单台设备月度能耗环比异常阈值' }
+    ]
+  },
+  experiment: {
+    items: [
+      { id: 'growth', name: '生长增重率异常波动上限', value: 20, unit: '%', desc: '', danger: false },
+      { id: 'survive', name: '成活率过低预警阈值', value: 80, unit: '%', desc: '低于此成活率触发预警', danger: true },
+      { id: 'control', name: '偏离对照组数据阈值', value: 15, unit: '%', desc: '与对照组差异超过阈值自动标记异常', danger: false }
+    ]
+  },
+  security: {
+    items: [
+      { id: 'patrol', name: '每班最少巡检次数', value: 2, unit: '次/班', desc: '未达标自动推送巡检任务' },
+      { id: 'response', name: '异常响应时长上限', value: 30, unit: 'min', desc: '' },
+      { id: 'attendance', name: '到岗率最低要求', value: 85, unit: '%', desc: '' },
+      { id: 'workHours', name: '连续工作时长上限提醒', value: 8, unit: 'h', desc: '' }
+    ],
+    intrusion: { enabled: true, desc: '非值班时段检测到人员进入鱼场区域时立即告警' }
+  },
+  holding: {
+    items: [
+      { id: 'mortality', name: '暂养死亡率预警', value: 0.5, unit: '%', desc: '风味优化暂养阶段', danger: true },
+      { id: 'weightLoss', name: '成品掉秤率预警', value: 3, unit: '%', desc: '', danger: false }
+    ]
+  },
+  timeout: {
+    overdue: [
+      { level: '紧急任务', hours: 0.25, color: 'red' },
+      { level: '优先任务', hours: 2, color: 'orange' },
+      { level: '日常任务', hours: 24, color: 'blue' }
+    ],
+    alarmTask: { value: 0.5, unit: '小时', desc: '超时未处理则升级告警等级', danger: true }
+  },
+  association: {
+    triggers: [
+      '溶解氧 < 临界低值 (3.0 mg/L)',
+      '溶解氧 < 警告低值 (4.0 mg/L)',
+      'pH 值 < 警告低值 (7.0)',
+      'pH 值 > 警告高值 (8.0)',
+      '氨氮 > 警戒值 (0.2 mg/L)',
+      '氨氮 > 危险值 (0.4 mg/L)',
+      '亚硝酸盐 > 危险值 (0.5 mg/L)',
+      '硝酸盐 > 预警值 (35 mg/L)',
+      '水体温度 > 警告高值',
+      '水体温度 < 临界低值',
+      '全场温差 > 0.8°C',
+      '土臭素 GSM > 预警值',
+      '鱼类死亡率 > 0.1%',
+      '健康评分 < 85 分 (高风险)',
+      '饵料系数 FCR > 上限 (1.5)',
+      '投喂偏差 > 100%',
+      '过滤器压差 > 临界高值',
+      '连续停机 > 30 min',
+      '月度故障次数 > 警告值',
+      '到岗率 < 85%'
+    ],
+    actions: [
+      '启动备用增氧机 + 发送告警至负责人',
+      '降低投饵频率至 50% + 触发告警',
+      '提升换水率 + 暂停投饵 + 紧急通知',
+      '记录异常事件 + 推送巡检任务',
+      '触发滤材清洗流程 + 设备告警',
+      '生成紧急巡检任务 + 通知兽医',
+      '关闭进水阀门 + 启动应急预案',
+      '自动调节增氧机转速',
+      '暂停投喂 + 发送水质告警',
+      '升级告警等级至紧急'
+    ],
+    rules: [
+      { id: 'r1', trigger: '溶解氧 < 临界低值 (3.0 mg/L)', action: '启动备用增氧机 + 发送告警至负责人', delay: 0, enabled: true },
+      { id: 'r2', trigger: '溶解氧 < 警告低值 (4.0 mg/L)', action: '自动调节增氧机转速', delay: 0, enabled: true },
+      { id: 'r3', trigger: '水体温度 > 警告高值', action: '暂停投喂 + 发送水质告警', delay: 0, enabled: true },
+      { id: 'r4', trigger: '水体温度 < 临界低值', action: '关闭进水阀门 + 启动应急预案', delay: 0, enabled: true },
+      { id: 'r5', trigger: '氨氮 > 危险值 (0.4 mg/L)', action: '提升换水率 + 暂停投饵 + 紧急通知', delay: 0, enabled: true },
+      { id: 'r6', trigger: '亚硝酸盐 > 危险值 (0.5 mg/L)', action: '提升换水率 + 暂停投饵 + 紧急通知', delay: 0, enabled: true },
+      { id: 'r7', trigger: '全场温差 > 0.8°C', action: '记录异常事件 + 推送巡检任务', delay: 0, enabled: true },
+      { id: 'r8', trigger: '鱼类死亡率 > 0.1%', action: '生成紧急巡检任务 + 通知兽医', delay: 0, enabled: true },
+      { id: 'r9', trigger: '健康评分 < 85 分 (高风险)', action: '生成紧急巡检任务 + 通知兽医', delay: 0, enabled: true },
+      { id: 'r10', trigger: '饵料系数 FCR > 上限 (1.5)', action: '降低投饵频率至 50% + 触发告警', delay: 0, enabled: true },
+      { id: 'r11', trigger: '投喂偏差 > 100%', action: '暂停投喂 + 发送水质告警', delay: 0, enabled: true },
+      { id: 'r12', trigger: '过滤器压差 > 临界高值', action: '触发滤材清洗流程 + 设备告警', delay: 0, enabled: true }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+.dockerignore
+dist
+node_modules
+**/node_modules
+.git
+services/modules-api/backends/**/node_modules

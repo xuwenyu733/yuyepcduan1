@@ -1,0 +1,46 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Large point cloud / mesh assets (keep folder placeholders)
+assets/pointcloud/raw/*
+!assets/pointcloud/raw/.gitkeep
+assets/pointcloud/processed/*
+!assets/pointcloud/processed/.gitkeep
+assets/models/*
+!assets/models/.gitkeep
+*.ply
+*.las
+*.laz
+*.e57
+*.pcd
+*.xyz
+*.pts
+
+# Local telemetry database
+data/*.sqlite
+data/*.sqlite-*
+data/*.db
+# Allow shipping the demo glb if you choose to commit a small one
+# public/models/factory.glb

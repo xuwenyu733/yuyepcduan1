@@ -1,0 +1,73 @@
+# 本地无 MySQL 启动配置：使用 H2 内存库，仅用于查看架构 / Swagger，不依赖外部数据库
+server:
+  port: 48181
+
+spring:
+  main:
+    lazy-initialization: true # 延迟加载，减少启动时对表的依赖
+  cache:
+    type: simple # 不依赖 Redis
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+      - org.flowable.spring.boot.ProcessEngineAutoConfiguration
+      - org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration
+      - org.flowable.spring.boot.EndpointAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  datasource:
+    druid:
+      web-stat-filter:
+        enabled: false
+      stat-view-servlet:
+        enabled: false
+    dynamic:
+      druid:
+        initial-size: 1
+        min-idle: 1
+        max-active: 5
+        validation-query: SELECT 1
+      primary: master
+      datasource:
+        master:
+          url: jdbc:h2:mem:yudao;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=value;DB_CLOSE_DELAY=-1
+          driver-class-name: org.h2.Driver
+          username: sa
+          password:
+        slave:
+          lazy: true
+          url: jdbc:h2:mem:yudao;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;NON_KEYWORDS=value;DB_CLOSE_DELAY=-1
+          driver-class-name: org.h2.Driver
+          username: sa
+          password:
+
+  quartz:
+    auto-startup: false
+
+flowable:
+  database-schema-update: false
+  check-process-definitions: false
+
+yudao:
+  captcha:
+    enable: false
+  security:
+    mock-enable: true
+  tenant:
+    enable: false
+  access-log:
+    enable: false
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    root: INFO
+    cn.iocoder.yudao: INFO
+
+debug: false

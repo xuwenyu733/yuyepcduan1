@@ -1,0 +1,200 @@
+server:
+  port: 48080
+
+--- #################### 数据库相关配置 ####################
+spring:
+  # 数据源配置项
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure # 排除 Druid 的自动配置，使用 dynamic-datasource-spring-boot-starter 配置多数据源
+  datasource:
+    druid: # Druid 【监控】相关的全局配置
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        allow: # 设置白名单，不填则允许所有访问
+        url-pattern: /druid/*
+        login-username: # 控制台管理用户名和密码
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true # 慢 SQL 记录
+          slow-sql-millis: 100
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+    dynamic: # 多数据源配置
+      druid: # Druid 【连接池】相关的全局配置
+        initial-size: 5 # 初始连接数
+        min-idle: 10 # 最小连接池数量
+        max-active: 20 # 最大连接池数量
+        max-wait: 7000 # 配置获取连接等待超时的时间，单位：毫秒
+#        numTestsPerEvictionRun: 50
+        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒
+        min-evictable-idle-time-millis: 30000 # 配置一个连接在池中最小生存的时间，单位：毫秒
+        max-evictable-idle-time-millis: 900000 # 配置一个连接在池中最大生存的时间，单位：毫秒
+        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+      primary: master
+      datasource:
+        master:
+          name: kbs_dev # kbs_dev
+          #          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://local_use1:3309/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://47.95.167.119:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://192.168.10.128:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+          #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
+          #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
+          #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.master.name} # SQLServer 连接的示例
+          username: kbs_dev
+          password: ypSawDSRkjTeYAff
+#          username: root
+#          password: root
+        slave: # 模拟从库，可根据自己需要修改
+          name: kbs_dev
+          #          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
+          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://local_use1:3309/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://47.95.167.119:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://192.168.10.128:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+#          url: jdbc:mysql://62.234.24.220:3306/${spring.datasource.dynamic.datasource.master.name}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&autoReconnect=true&autoReconnectForPools=true&connectTimeout=30000&socketTimeout=60000 # MySQL Connector/J 5.X 连接的示例
+          #          url: jdbc:postgresql://127.0.0.1:5432/${spring.datasource.dynamic.datasource.slave.name} # PostgreSQL 连接的示例
+          #          url: jdbc:oracle:thin:@127.0.0.1:1521:xe # Oracle 连接的示例
+          #          url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=${spring.datasource.dynamic.datasource.slave.name} # SQLServer 连接的示例
+          username: kbs_dev
+          password: ypSawDSRkjTeYAff
+#          username: root
+#          password: root
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  redis:
+    host: fm # 地址
+    port: 6379 # 端口
+    database: 4 # 数据库索引
+#    password: '123456' # 密码，建议生产环境开启
+
+--- #################### 定时任务相关配置 ####################
+
+# Quartz 配置项，对应 QuartzProperties 配置类
+spring:
+  quartz:
+    auto-startup: false # 本地开发环境，尽量不要开启 Job
+    scheduler-name: schedulerName # Scheduler 名字。默认为 schedulerName
+    job-store-type: jdbc # Job 存储器类型。默认为 memory 表示内存，可选 jdbc 使用数据库。
+    wait-for-jobs-to-complete-on-shutdown: true # 应用关闭时，是否等待定时任务执行完成。默认为 false ，建议设置为 true
+    properties: # 添加 Quartz Scheduler 附加属性，更多可以看 http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html 文档
+      org:
+        quartz:
+          # Scheduler 相关配置
+          scheduler:
+            instanceName: schedulerName
+            instanceId: AUTO # 自动生成 instance ID
+          # JobStore 相关配置
+          jobStore:
+            # JobStore 实现类。可见博客：https://blog.csdn.net/weixin_42458219/article/details/122247162
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            isClustered: true # 是集群模式
+            clusterCheckinInterval: 15000 # 集群检查频率，单位：毫秒。默认为 15000，即 15 秒
+            misfireThreshold: 60000 # misfire 阀值，单位：毫秒。
+#            lockHandler:
+#              class: org.quartz.impl.jdbcjobstore.StdRowLockSemaphore
+#              maxRetry: 7
+#              retryPeriod: 3000
+          # 线程池相关配置
+          threadPool:
+            threadCount: 25 # 线程池大小。默认为 10 。
+            threadPriority: 5 # 线程优先级
+            class: org.quartz.simpl.SimpleThreadPool # 线程池类型
+    jdbc: # 使用 JDBC 的 JobStore 的时候，JDBC 的配置
+      initialize-schema: NEVER # 是否自动使用 SQL 初始化 Quartz 表结构。这里设置成 never ，我们手动创建表结构。
+
+--- #################### 监控相关配置 ####################
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      base-path: /actuator # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      exposure:
+        include: '*' # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+
+# 日志文件配置
+logging:
+  file:
+    name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
+  level:
+    # 配置自己写的 MyBatis Mapper 打印日志
+    cn.kbsys.kbs.module.infra.dal.mysql: debug
+    cn.kbsys.kbs.module.infra.dal.mysql.job.JobLogMapper: INFO # 配置 JobLogMapper 的日志级别为 info
+    cn.kbsys.kbs.module.system.dal.mysql: debug
+    cn.kbsys.kbs.module.tool.dal.mysql: debug
+    cn.kbsys.kbs.module.trade.dal.mysql: debug
+    cn.kbsys.kbs.module.workflow.dal.mysql: debug
+    cn.kbsys.kbs.module.pl.dal.mysql: debug
+
+debug: false
+
+--- #################### 微信公众号、小程序相关配置 ####################
+wx:
+  # 企业微信号配置(必填)
+  cp:
+    corp-id: wwe6665a847fd773a4
+    corp-secret: oaRSsjZQqhPswGlEUnj0N4KvZ_p2zHH_SPWD9jC4paM
+    # 选填
+    token:
+    aes-key:
+    agent-id: 1000020
+    # ConfigStorage 配置（选填）
+    config-storage.type: memory # 配置类型: memory(默认), jedis, redisson, redistemplate
+    # http 客户端配置（选填）
+    #  config-storage.http-proxy-host:
+    #  config-storage.http-proxy-port:
+    #  config-storage.http-proxy-username:
+    #  config-storage.http-proxy-password:
+    # 最大重试次数，默认：5 次，如果小于 0，则为 0
+    config-storage.max-retry-times: 5
+    # 重试时间间隔步进，默认：1000 毫秒，如果小于 0，则为 1000
+    config-storage.retry-sleep-millis: 1000
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+kbs:
+  captcha:
+    enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试；
+  security:
+    mock-enable: true
+  xss:
+    enable: false
+    exclude-urls: # 如下两个 url，仅仅是为了演示，去掉配置也没关系
+      - ${spring.boot.admin.context-path}/** # 不处理 Spring Boot Admin 的请求
+      - ${management.endpoints.web.base-path}/** # 不处理 Actuator 的请求
+  access-log: # 访问日志的配置项
+    enable: false
+  error-code: # 错误码相关配置项
+    enable: false
+  demo: false # 关闭演示模式
+
+justauth:
+  enabled: true
+  type:
+    WECHAT_ENTERPRISE: # 企业微信
+      client-id: wwe6665a847fd773a4
+      client-secret: oaRSsjZQqhPswGlEUnj0N4KvZ_p2zHH_SPWD9jC4paM
+      agent-id: 1000020
+      ignore-check-redirect-uri: true
+  cache:
+    type: REDIS
+    prefix: 'social_auth_state:' # 缓存前缀，目前只对 Redis 缓存生效，默认 JUSTAUTH::STATE::
+    timeout: 24h # 超时时长，目前只对 Redis 缓存生效，默认 3 分钟
+
+# 缓存文件位置
+outPutFilePath: E:\Work\xzs\1.开始熟悉框架\3.kbs\2.需求整理\2.产品\word_test\案例2
+

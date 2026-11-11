@@ -1,0 +1,34 @@
+# 养殖平台「部署合成」示例：前端 nginx + 模块 Node BFF
+# Java（yudao-server）可继续用已有容器/同机进程，只需能被 prod-api 访问到。
+#
+# 启动：
+#   docker compose -f docker-compose.modules.yml up -d --build
+#
+# 访问：
+#   http://localhost/                 前端
+#   http://localhost/modules-api/api/health
+#   http://localhost/prod-api/        → Java（需自行提供 yudao-server）
+
+services:
+  modules-api:
+    build: ./services/modules-api
+    container_name: kede-modules-api
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    environment:
+      PORT: "3020"
+      PMIS_ENABLED: "${PMIS_ENABLED:-true}"
+      PMIS_BASE_URL: "${PMIS_BASE_URL:-https://www.wiidu.com.cn/zx/datainf/mysql}"
+      PMIS_TIMEOUT_MS: "${PMIS_TIMEOUT_MS:-30000}"
+
+  web:
+    build: .
+    container_name: kede-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - modules-api
+    # 若本机已有 Java 容器名为 yudao-server，取消下面注释并保证同一网络
+    # extra_hosts 或 external network 按实际环境调整

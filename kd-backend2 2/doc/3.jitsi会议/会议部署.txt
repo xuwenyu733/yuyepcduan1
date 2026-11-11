@@ -1,0 +1,21 @@
+2.2 高配服务器 tenxun_2_2025_me 43.138.113.106
+work ip：   219.141.0.0/16
+home ip：   123.117.0.0/16   61.149.121.0/24
+服务器公ip：   82.156.5.76
+服务器公ip：   43.138.113.106
+服务器私ip：   172.21.0.11
+
+部署路径：   /data/jitsi_data/jitsi
+重启脚本：
+docker compose down
+docker compose up -d
+
+
+
+
+
+
+
+
+
+

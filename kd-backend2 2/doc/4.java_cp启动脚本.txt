@@ -1,0 +1,86 @@
+
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-common</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-bpm</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-erp</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-fish</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-infra</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-module-system</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-biz-data-permission</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-biz-ip</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-biz-tenant</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-excel</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-job</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-monitor</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-mq</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-mybatis</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-protection</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-redis</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-security</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-web</artifactId>
+</include>
+<include>
+    <groupId>cn.iocoder.boot</groupId>
+    <artifactId>yudao-spring-boot-starter-websocket</artifactId>
+</include>
+
+java -Xverify:none -Dundertow.port=48080 -Dundertow.host=0.0.0.0 -cp ^
+E:\back_2t\Users\Idea_202004\work\0915\code1\kede_jidi3\kede_znt_kbs\kbs-server\target/kbs-server.jar;^
+E:\back_2t\Users\Idea_202004\work\0915\code1\kede_jidi3\kede_znt_kbs\kbs-server\target/libs/*;^
+E:\back_2t\Users\Idea_202004\work\0915\code1\kede_jidi3\kede_znt_kbs\kbs-server\target/kbs-server.jar ^
+cn.kbsys.kbs.server.KbsServerApplication
+
+java -Dloader.path=E:\back_2t\Users\Idea_202004\work\0915\code1\kede_jidi3\kede_znt_kbs\kbs-server\target/libs -jar ^
+E:\back_2t\Users\Idea_202004\work\0915\code1\kede_jidi3\kede_znt_kbs\kbs-server\target/kbs-server.jar --spring.profiles.active=dev

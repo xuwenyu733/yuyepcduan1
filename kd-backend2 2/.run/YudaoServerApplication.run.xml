@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="YudaoServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="yudao-server" />
+    <option name="SHORTEN_COMMAND_LINE" value="MANIFEST" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="cn.iocoder.yudao.server.YudaoServerApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

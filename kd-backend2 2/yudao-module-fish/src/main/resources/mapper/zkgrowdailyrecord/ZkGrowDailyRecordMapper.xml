@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.iocoder.yudao.module.fish.dal.mysql.zkgrowdailyrecord.ZkGrowDailyRecordMapper">
+
+    <select id="selectRealStats" resultType="cn.iocoder.yudao.module.fish.dal.dataobject.zkgrowdailyrecord.ZkGrowRealStatsDO">
+        SELECT 
+            a1.pond_id AS pondId,
+            a5.batch_number AS batchNumber,
+            zp.pond_num AS pondNum,
+            zp.pond_detail_num AS pondDetailNum,
+            a1.first_day AS firstDay,
+            a1.breeding_days AS breedingDays,
+            COALESCE(a4.avg_specs, a1.fish_spec) AS fishSpec,
+            a1.fish_spec AS initialWeightSpec,
+            a4.avg_body_length AS avgBodyLength,
+            COALESCE(a2.baitingRate, 3.2) AS baitingRate,
+            COALESCE(a3.metric_value, 25) AS temperature
+        FROM (
+            SELECT 
+                pond_id,
+                MAX(first_day) AS first_day,
+                DATEDIFF(NOW(), MAX(first_day)) AS breeding_days,
+                MAX(fish_spec) AS fish_spec
+            FROM (
+                SELECT 
+                    pond_id, 
+                    MAX(create_time) AS first_day,
+                    MAX(fish_spec) AS fish_spec 
+                FROM zk_pond_fish_detail zpfd
+                WHERE zpfd.add_type IN ('1')
+                GROUP BY pond_id 
+                UNION ALL
+                SELECT 
+                    target_pond_id AS pond_id, 
+                    MAX(create_time) AS first_day ,
+                    MAX(fish_spec) AS fish_spec
+                FROM zk_pond_fish_detail zpfd
+                WHERE zpfd.add_type IN ('-3')
+                GROUP BY target_pond_id  
+            ) t1 
+            GROUP BY pond_id
+        ) a1
+        LEFT JOIN (
+            SELECT 
+                zfl.pond_id,
+                zfl.feed_count,
+                COALESCE(zfl.feed_count/zp.total_weight, 3.2) AS baitingRate
+            FROM (
+                SELECT 
+                    zfl.pond_id, 
+                    SUM(zfl.feed_count) AS feed_count
+                FROM zk_feeding_log zfl 
+                GROUP BY pond_id
+            ) zfl
+            LEFT JOIN zk_pond zp ON zp.id = zfl.pond_id
+        ) a2 ON a1.pond_id = a2.pond_id
+        LEFT JOIN (
+            SELECT 
+                zd.pond_id,
+                zd.pond_name,
+                zdr.metric_value,
+                zdr.device_id,
+                zdr.metric_id
+            FROM (
+                SELECT 
+                device_id,
+                metric_id,
+                metric_value,
+                record_time,
+                ROW_NUMBER() OVER (
+                    PARTITION BY device_id, metric_id 
+                    ORDER BY record_time DESC
+                ) AS rn
+                FROM zk_device_record
+                WHERE 
+                deleted = 0
+                AND data_status = 1
+                AND (
+                    metric_id LIKE '%do_temp%'
+                )
+            ) zdr
+            INNER JOIN zk_device zd ON 
+                zd.device_sn = zdr.device_id 
+                AND zd.device_metric_id = zdr.metric_id
+                AND zd.deleted = 0
+                AND zd.status = '1'
+            WHERE 
+                zdr.rn = 1
+                AND zd.pond_id > 0
+            GROUP BY 
+                zd.pond_id, 
+                zd.pond_name,
+                zdr.metric_value,
+                zdr.device_id,
+                zdr.metric_id
+            ORDER BY 
+                zd.pond_id
+        ) a3 ON a1.pond_id = a3.pond_id
+        LEFT JOIN (
+            SELECT 
+                pond_id,
+                MAX(avg_specs) AS avg_specs,
+                MAX(avg_body_length) AS avg_body_length
+            FROM zk_fish_proofing
+            GROUP BY pond_id
+        ) a4 ON a1.pond_id = a4.pond_id
+        LEFT JOIN zk_pond zp ON zp.id = a1.pond_id
+        LEFT JOIN (
+            SELECT 
+                pond_id,
+                GROUP_CONCAT(DISTINCT batch_number SEPARATOR ',') batch_number
+            FROM zk_pond_fish_type zpft
+            WHERE zpft.static_year = YEAR(NOW()) 
+              AND zpft.static_month = MONTH(NOW()) 
+              AND zpft.static_day = DAY(NOW())
+            GROUP BY pond_id 
+        ) a5 ON a5.pond_id = a1.pond_id
+        <where>
+            <if test="batchNo != null and batchNo != ''">
+                AND FIND_IN_SET(#{batchNo}, a5.batch_number) > 0
+            </if>
+            <if test="pondNum != null and pondNum != ''">
+                AND zp.pond_num = #{pondNum}
+            </if>
+            <if test="pondDetailNum != null and pondDetailNum != ''">
+                AND zp.pond_detail_num = #{pondDetailNum}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectManualMeasurements" resultType="cn.iocoder.yudao.module.fish.dal.dataobject.zkgrowdailyrecord.ZkGrowManualMeasureDO">
+        SELECT 
+            pond_id AS pondId,
+            avg_body_length AS avgBodyLength,
+            avg_specs AS avgSpecs,
+            create_time AS createTime
+        FROM zk_fish_proofing
+        WHERE pond_id IN
+        <foreach item="id" collection="pondIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

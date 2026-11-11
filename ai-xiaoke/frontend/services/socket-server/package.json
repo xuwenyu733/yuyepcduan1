@@ -1,0 +1,13 @@
+{
+  "name": "kede-socket-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "本地音视频/IM Socket.IO 占位服务（对齐 VUE_APP_SOCKET_BACE_URL :9091）",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  }
+}

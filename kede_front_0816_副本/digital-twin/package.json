@@ -1,0 +1,25 @@
+{
+  "name": "fish-farm-digital-twin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,green \"npm run api\" \"vite\"",
+    "api": "node server/index.mjs",
+    "web": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.4",
+    "concurrently": "^9.2.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "three": "^0.185.1"
+  }
+}

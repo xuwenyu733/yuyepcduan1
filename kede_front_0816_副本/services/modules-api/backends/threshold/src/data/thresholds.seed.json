@@ -1,0 +1,844 @@
+{
+  "categories": [
+    {
+      "id": "water",
+      "name": "水质阈值",
+      "desc": "分指标配置，支持按品种单独设置区间",
+      "icon": "water"
+    },
+    {
+      "id": "device",
+      "name": "设备阈值",
+      "desc": "压力 / 液位 / 电流 / 能耗 / 运行频次",
+      "icon": "device"
+    },
+    {
+      "id": "mortality",
+      "name": "死亡规格阈值",
+      "desc": "5 档规格独立配置死亡条数 + 死亡率",
+      "icon": "fish"
+    },
+    {
+      "id": "health",
+      "name": "健康评分阈值",
+      "desc": "总分三级、分层分项得分阈值",
+      "icon": "health"
+    },
+    {
+      "id": "feeding",
+      "name": "投喂 & 生长阈值",
+      "desc": "投喂率、修正系数、FCR、生长速率",
+      "icon": "feed"
+    },
+    {
+      "id": "alarm",
+      "name": "报警通用阈值",
+      "desc": "告警等级、逾期、密集告警判定",
+      "icon": "alarm"
+    },
+    {
+      "id": "other",
+      "name": "其他辅助阈值",
+      "desc": "能耗、实验、人员、暂养损耗、任务超时",
+      "icon": "other"
+    }
+  ],
+  "species": ["通用", "大西洋鲑", "虹鳟", "加州鲈"],
+  "items": [
+    {
+      "id": "w_temp",
+      "category": "water",
+      "name": "水温标准区间",
+      "unit": "℃",
+      "type": "range",
+      "speciesAware": true,
+      "values": {
+        "通用": { "min": 10, "max": 28, "warnLow": null, "warnHigh": null },
+        "大西洋鲑": { "min": 10, "max": 16, "warnLow": null, "warnHigh": null },
+        "虹鳟": { "min": 8, "max": 14, "warnLow": null, "warnHigh": null },
+        "加州鲈": { "min": 22, "max": 28, "warnLow": null, "warnHigh": null }
+      },
+      "enabled": true,
+      "remark": "分品种配置"
+    },
+    {
+      "id": "w_ph",
+      "category": "water",
+      "name": "pH 值标准区间",
+      "unit": "",
+      "type": "range",
+      "speciesAware": false,
+      "values": {
+        "通用": { "min": 7.0, "max": 8.0, "warnLow": null, "warnHigh": null }
+      },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_do",
+      "category": "water",
+      "name": "溶解氧 DO",
+      "unit": "mg/L",
+      "type": "levels",
+      "speciesAware": false,
+      "levels": [
+        { "label": "正常", "op": ">=", "value": 5.0, "color": "green" },
+        { "label": "预警", "op": "range", "min": 4.0, "max": 5.0, "color": "yellow" },
+        { "label": "高危", "op": "range", "min": 3.0, "max": 4.0, "color": "orange" },
+        { "label": "紧急停食", "op": "<", "value": 3.0, "color": "red" }
+      ],
+      "enabled": true,
+      "remark": "≥5.0 正常；4.0~5.0 预警；3.0~4.0 高危；＜3.0 紧急停食"
+    },
+    {
+      "id": "w_nh3",
+      "category": "water",
+      "name": "氨氮 NH₃-N",
+      "unit": "mg/L",
+      "type": "levels",
+      "speciesAware": false,
+      "levels": [
+        { "label": "安全", "op": "<=", "value": 0.2, "color": "green" },
+        { "label": "警戒", "op": "range", "min": 0.2, "max": 0.4, "color": "yellow" },
+        { "label": "危险", "op": ">", "value": 0.4, "color": "red" }
+      ],
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_no2",
+      "category": "water",
+      "name": "亚硝酸盐 NO₂⁻-N",
+      "unit": "mg/L",
+      "type": "levels",
+      "speciesAware": false,
+      "levels": [
+        { "label": "安全", "op": "<=", "value": 0.2, "color": "green" },
+        { "label": "警戒", "op": "range", "min": 0.2, "max": 0.5, "color": "yellow" },
+        { "label": "危险", "op": ">", "value": 0.5, "color": "red" }
+      ],
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_no3",
+      "category": "water",
+      "name": "硝酸盐预警阈值",
+      "unit": "mg/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 35.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_tss",
+      "category": "water",
+      "name": "浊度 TSS 预警阈值",
+      "unit": "mg/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 20.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_orp",
+      "category": "water",
+      "name": "ORP 标准区间",
+      "unit": "mV",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 150, "max": 350, "warnLow": 100, "warnHigh": 400 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_alk",
+      "category": "water",
+      "name": "碱度标准区间",
+      "unit": "mg/L",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 80, "max": 150, "warnLow": null, "warnHigh": null } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_hard",
+      "category": "water",
+      "name": "硬度标准区间",
+      "unit": "mg/L",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 50, "max": 200, "warnLow": null, "warnHigh": null } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_co2",
+      "category": "water",
+      "name": "二氧化碳 CO₂ 预警阈值",
+      "unit": "mg/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 15.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_tp",
+      "category": "water",
+      "name": "总磷预警阈值",
+      "unit": "mg/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.5 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_tn",
+      "category": "water",
+      "name": "总氮预警阈值",
+      "unit": "mg/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 5.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_gsm",
+      "category": "water",
+      "name": "GSM 土臭素预警阈值",
+      "unit": "ng/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 10.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_mib",
+      "category": "water",
+      "name": "MIB(2-MIB) 预警阈值",
+      "unit": "ng/L",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 10.0 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "w_temp_diff",
+      "category": "water",
+      "name": "全厂鱼池温差阈值",
+      "unit": "℃",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.8 } },
+      "enabled": true,
+      "remark": "≤0.8℃ 正常，超阈值预警"
+    },
+    {
+      "id": "d_pressure",
+      "category": "device",
+      "name": "循环管道压力阈值",
+      "unit": "MPa",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.8 } },
+      "enabled": true,
+      "remark": "超过视为异常"
+    },
+    {
+      "id": "d_voltage",
+      "category": "device",
+      "name": "设备电压上下限",
+      "unit": "V",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 200, "max": 240, "warnLow": 190, "warnHigh": 250 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_current",
+      "category": "device",
+      "name": "设备电流上下限",
+      "unit": "A",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 0, "max": 50, "warnLow": null, "warnHigh": 45 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_freq",
+      "category": "device",
+      "name": "设备运行频率上下限",
+      "unit": "Hz",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 20, "max": 50, "warnLow": 15, "warnHigh": 55 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_filter",
+      "category": "device",
+      "name": "微滤机反冲洗频次异常阈值",
+      "unit": "次/日",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 4, "max": 24, "warnLow": 2, "warnHigh": 30 } },
+      "enabled": true,
+      "remark": "过高/过低触发预警"
+    },
+    {
+      "id": "d_aerator",
+      "category": "device",
+      "name": "增氧电磁阀启停频次阈值",
+      "unit": "次/日",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 10, "max": 200, "warnLow": 5, "warnHigh": 300 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_co2_hours",
+      "category": "device",
+      "name": "CO₂ 脱气设备运行时长阈值",
+      "unit": "h/日",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 12 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_level_pump",
+      "category": "device",
+      "name": "水泵池液位高低限",
+      "unit": "m",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 0.5, "max": 2.5, "warnLow": 0.3, "warnHigh": 2.8 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_level_fixed",
+      "category": "device",
+      "name": "固定床液位高低限",
+      "unit": "m",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 0.4, "max": 2.0, "warnLow": 0.2, "warnHigh": 2.2 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_level_mbbr",
+      "category": "device",
+      "name": "移动床液位高低限",
+      "unit": "m",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 0.4, "max": 2.0, "warnLow": 0.2, "warnHigh": 2.2 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_fault_month",
+      "category": "device",
+      "name": "设备月度故障次数预警",
+      "unit": "次/月",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 3 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "d_energy_mom",
+      "category": "device",
+      "name": "单设备能耗环比波动阈值",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 30 } },
+      "enabled": true,
+      "remark": "如环比下降 52% 异常"
+    },
+    {
+      "id": "d_stop_hours",
+      "category": "device",
+      "name": "设备连续停机时长预警",
+      "unit": "h",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 4 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "m_0_1",
+      "category": "mortality",
+      "name": "0-1g 规格",
+      "unit": "",
+      "type": "mortality",
+      "speciesAware": false,
+      "mortality": {
+        "rate": 0.1,
+        "trendRise": 10,
+        "dailyCount": 100
+      },
+      "enabled": true,
+      "remark": "死亡率＞0.1% / 近5日均值上升10% / 单日死亡＞100尾"
+    },
+    {
+      "id": "m_1_5",
+      "category": "mortality",
+      "name": "1-5g 规格",
+      "unit": "",
+      "type": "mortality",
+      "speciesAware": false,
+      "mortality": { "rate": 0.1, "trendRise": 10, "dailyCount": 30 },
+      "enabled": true,
+      "remark": "死亡率＞0.1% / 近5日均值上升10% / 单日死亡＞30尾"
+    },
+    {
+      "id": "m_5_25",
+      "category": "mortality",
+      "name": "5-25g 规格",
+      "unit": "",
+      "type": "mortality",
+      "speciesAware": false,
+      "mortality": { "rate": 0.1, "trendRise": 10, "dailyCount": 20 },
+      "enabled": true,
+      "remark": "死亡率＞0.1% / 近5日均值上升10% / 单日死亡＞20尾"
+    },
+    {
+      "id": "m_25_250",
+      "category": "mortality",
+      "name": "25-250g 规格",
+      "unit": "",
+      "type": "mortality",
+      "speciesAware": false,
+      "mortality": { "rate": 0.1, "trendRise": 10, "dailyCount": 10 },
+      "enabled": true,
+      "remark": "死亡率＞0.1% / 近5日均值上升10% / 单日死亡＞10尾"
+    },
+    {
+      "id": "m_1000",
+      "category": "mortality",
+      "name": "1000g 以上规格",
+      "unit": "",
+      "type": "mortality",
+      "speciesAware": false,
+      "mortality": { "rate": 0.1, "trendRise": 10, "dailyCount": 5 },
+      "enabled": true,
+      "remark": "死亡率＞0.1% / 近5日均值上升10% / 单日死亡＞5尾"
+    },
+    {
+      "id": "m_7day",
+      "category": "mortality",
+      "name": "鱼池七日死亡率预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.5 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "m_factory",
+      "category": "mortality",
+      "name": "全场整体平均死亡率预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.3 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "h_excellent",
+      "category": "health",
+      "name": "优秀（绿色）",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 95 } },
+      "enabled": true,
+      "remark": "综合得分 ≥ 此值"
+    },
+    {
+      "id": "h_watch",
+      "category": "health",
+      "name": "关注（黄色）下限",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 85 } },
+      "enabled": true,
+      "remark": "85~94 分为关注"
+    },
+    {
+      "id": "h_risk",
+      "category": "health",
+      "name": "介入高风险（红色）",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 85 } },
+      "enabled": true,
+      "remark": "综合得分 ＜ 此值触发红色预警"
+    },
+    {
+      "id": "h_env",
+      "category": "health",
+      "name": "外部环境层安全得分下限",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 16 } },
+      "enabled": true,
+      "remark": "满分 20，＜16/20 预警"
+    },
+    {
+      "id": "h_behavior",
+      "category": "health",
+      "name": "外观行为层安全得分下限",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 48 } },
+      "enabled": true,
+      "remark": "满分 60，＜48/60 预警；分项：摄食量15/程度10/体型5/体色5/损伤5/游泳10/死亡10"
+    },
+    {
+      "id": "h_internal",
+      "category": "health",
+      "name": "内部肌体层脏器异常判定阈值",
+      "unit": "分",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 16 } },
+      "enabled": true,
+      "remark": "满分 20，＜16/20 预警"
+    },
+    {
+      "id": "f_dev",
+      "category": "feeding",
+      "name": "投喂偏差预警阈值",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 100 } },
+      "enabled": true,
+      "remark": "实际与 AI 推荐偏差超此比例高亮预警"
+    },
+    {
+      "id": "f_temp_low",
+      "category": "feeding",
+      "name": "水温低温区上限",
+      "unit": "℃",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 22 } },
+      "enabled": true,
+      "remark": "16~22℃ 低温修正区间"
+    },
+    {
+      "id": "f_temp_opt",
+      "category": "feeding",
+      "name": "水温适温区上限",
+      "unit": "℃",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 28 } },
+      "enabled": true,
+      "remark": "22~28℃ 适温"
+    },
+    {
+      "id": "f_temp_high",
+      "category": "feeding",
+      "name": "水温高温区上限",
+      "unit": "℃",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 32 } },
+      "enabled": true,
+      "remark": "28~32℃ 高温"
+    },
+    {
+      "id": "f_fcr_min",
+      "category": "feeding",
+      "name": "目标 FCR 下限（加州鲈）",
+      "unit": "",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 1.2 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "f_fcr_max",
+      "category": "feeding",
+      "name": "目标 FCR 上限（加州鲈）",
+      "unit": "",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 1.5 } },
+      "enabled": true,
+      "remark": "高于上限告警"
+    },
+    {
+      "id": "f_sgr",
+      "category": "feeding",
+      "name": "特定生长率 SGR 预警阈值",
+      "unit": "%/日",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 1.5 } },
+      "enabled": true,
+      "remark": "低于阈值触发长势预警"
+    },
+    {
+      "id": "f_growth_dev",
+      "category": "feeding",
+      "name": "实测与 AI 预测曲线偏差阈值",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 15 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "f_meal_small",
+      "category": "feeding",
+      "name": "＜50g 日投喂频次下限~上限",
+      "unit": "餐",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 4, "max": 6, "warnLow": null, "warnHigh": null } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "f_meal_mid",
+      "category": "feeding",
+      "name": "50~200g 日投喂频次",
+      "unit": "餐",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 3, "max": 4, "warnLow": null, "warnHigh": null } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "f_meal_large",
+      "category": "feeding",
+      "name": "＞200g 日投喂频次",
+      "unit": "餐",
+      "type": "range",
+      "speciesAware": false,
+      "values": { "通用": { "min": 2, "max": 3, "warnLow": null, "warnHigh": null } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "a_overdue_urgent",
+      "category": "alarm",
+      "name": "紧急报警逾期时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 30 } },
+      "enabled": true,
+      "remark": "超时弹窗提醒"
+    },
+    {
+      "id": "a_overdue_priority",
+      "category": "alarm",
+      "name": "优先报警逾期时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 120 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "a_overdue_normal",
+      "category": "alarm",
+      "name": "日常报警逾期时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 480 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "a_dense_count",
+      "category": "alarm",
+      "name": "同区域同类报警密集触发条数",
+      "unit": "条",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 5 } },
+      "enabled": true,
+      "remark": "短时间多条同类告警判定系统性风险"
+    },
+    {
+      "id": "a_dense_window",
+      "category": "alarm",
+      "name": "密集告警判定时间窗",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 30 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "a_multi",
+      "category": "alarm",
+      "name": "多指标同步告警判定",
+      "unit": "项",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 2 } },
+      "enabled": true,
+      "remark": "同一鱼池水质+设备同时异常判定最高优先级"
+    },
+    {
+      "id": "o_energy_mom",
+      "category": "other",
+      "name": "月度总能耗环比波动阈值",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 20 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_energy_share",
+      "category": "other",
+      "name": "单类设备能耗占比过高预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 40 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_exp_growth",
+      "category": "other",
+      "name": "实验生长增重率异常波动阈值",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 25 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_exp_survive",
+      "category": "other",
+      "name": "实验成活率过低预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 90 } },
+      "enabled": true,
+      "remark": "低于此值预警"
+    },
+    {
+      "id": "o_patrol",
+      "category": "other",
+      "name": "巡检频次最低要求",
+      "unit": "次/日",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 2 } },
+      "enabled": true,
+      "remark": "未达标预警"
+    },
+    {
+      "id": "o_work_hours",
+      "category": "other",
+      "name": "人员连续工作时长上限",
+      "unit": "h",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 8 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_temp_mortality",
+      "category": "other",
+      "name": "暂养死亡率预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 0.5 } },
+      "enabled": true,
+      "remark": "风味优化暂养"
+    },
+    {
+      "id": "o_weight_loss",
+      "category": "other",
+      "name": "成品掉秤率预警",
+      "unit": "%",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 3 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_task_urgent",
+      "category": "other",
+      "name": "紧急任务逾期判定时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 60 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_task_priority",
+      "category": "other",
+      "name": "优先任务逾期判定时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 240 } },
+      "enabled": true,
+      "remark": ""
+    },
+    {
+      "id": "o_task_normal",
+      "category": "other",
+      "name": "日常任务逾期判定时限",
+      "unit": "分钟",
+      "type": "single",
+      "speciesAware": false,
+      "values": { "通用": { "warn": 1440 } },
+      "enabled": true,
+      "remark": ""
+    }
+  ],
+  "updatedAt": null
+}

@@ -1,0 +1,14 @@
+package cn.iocoder.yudao.module.fish.controller.admin.zkspecslog.vo;
+
+import lombok.*;
+import java.util.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+
+@Schema(description = "管理后台 - 规格记录创建 Request VO")
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ZkSpecsLogCreateReqVO extends ZkSpecsLogBaseVO {
+
+}

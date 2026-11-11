@@ -1,0 +1,225 @@
+<template>
+  <div>
+    <Dropdown
+      ref="dropdownRef"
+      trigger="click"
+      placement="top"
+      :teleported="false"
+      :hideOnClick="false"
+    >
+      <IconButton :title="t('Invite.Title')">
+        <IconInvite :size="24" />
+      </IconButton>
+      <template #dropdown>
+        <div class="operate-list">
+          <div class="operate-item" @click="handleOpenUserPicker">
+            <IconInvite :size="16" />
+            <span class="operate-item-text">{{ t('Invite.AddMember') }}</span>
+          </div>
+          <div class="operate-item" @click="handleOpenRoomShare">
+            <IconShare :size="16" />
+            <span class="operate-item-text">{{ t('Invite.ShareRoom') }}</span>
+          </div>
+        </div>
+      </template>
+    </Dropdown>
+
+    <TUIDialog
+      v-model:visible="userPickerVisible"
+      appendTo="#roomPage"
+      :title="`${t('Contacts')} (${userPickerData.length})`"
+    >
+      <UserPicker
+        v-if="userPickerVisible"
+        ref="userPickerRef"
+        class="room-user-picker"
+        :data-source="userPickerData"
+        display-mode="list"
+      />
+      <template #footer>
+        <div class="user-picker-footer">
+          <TUIButton @click="userPickerVisible = false">
+            {{ t('Room.Cancel') }}
+          </TUIButton>
+          <TUIButton type="primary" @click="handleUserPickerConfirm">
+            {{ t('Room.Confirm') }}
+          </TUIButton>
+        </div>
+      </template>
+    </TUIDialog>
+
+    <TUIDialog
+      v-model:visible="roomShareVisible"
+      appendTo="#roomPage"
+      :title="t('Room.InviteToMeeting', { userName: loginUserInfo?.userName || loginUserInfo?.userId })"
+      :custom-classes="['room-share-dialog']"
+    >
+      <RoomShare :room-info="currentRoom" />
+      <template #footer>
+        <div />
+      </template>
+    </TUIDialog>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { computed, nextTick, ref, watch } from 'vue';
+import { Dropdown, IconInvite, IconShare, TUIButton, TUIDialog, TUIToast, useUIKit } from '@tencentcloud/uikit-base-component-vue3';
+import { useContactListState } from 'tuikit-atomicx-vue3/chat';
+import { UserPicker, useLoginState, useRoomParticipantState, useRoomState, RoomParticipantStatus } from 'tuikit-atomicx-vue3/room';
+import { conference } from '../../adapter/conference';
+import IconButton from '../base/IconButton.vue';
+import RoomShare from './RoomShare.vue';
+import type { RoomUser } from 'tuikit-atomicx-vue3/room';
+
+const { t } = useUIKit();
+const { loginUserInfo } = useLoginState();
+const { currentRoom, callUserToRoom } = useRoomState();
+const { participantList, pendingParticipantList } = useRoomParticipantState();
+const { friendList: defaultFriendList } = useContactListState();
+
+const dropdownRef = ref<{ closeDropdown?: () => void }>();
+const userPickerRef = ref();
+const userPickerVisible = ref(false);
+const roomShareVisible = ref(false);
+const customContactList = ref<RoomUser[]>([]);
+
+const contactListProvider = computed(() => conference.getFeatureConfig('contactList'));
+
+watch(contactListProvider, async (provider) => {
+  if (provider) {
+    try {
+      customContactList.value = await provider();
+    } catch (error) {
+      console.warn('Failed to load custom contact list:', error);
+    }
+  } else {
+    customContactList.value = [];
+  }
+}, { immediate: true });
+
+const friendList = computed(() => {
+  if (contactListProvider.value) {
+    return customContactList.value.map(item => ({
+      userID: item.userId,
+      nick: item.userName || '',
+      avatar: item.avatarUrl || '',
+    }));
+  }
+  return defaultFriendList.value;
+});
+
+const userPickerData = computed(() => friendList.value
+  .filter(item => !participantList.value.some(participant => participant.userId === item.userID))
+  .filter(item => !pendingParticipantList.value.some(user => user.userId === item.userID && user.roomStatus === RoomParticipantStatus.InCalling))
+  .map(item => ({
+    key: item.userID,
+    label: item.nick,
+    avatarUrl: item.avatar,
+    extraData: item,
+  })));
+
+const openDialogAfterCloseDropdown = async (dialog: 'userPicker' | 'roomShare') => {
+  dropdownRef.value?.closeDropdown?.();
+  await nextTick();
+  if (dialog === 'userPicker') {
+    userPickerVisible.value = true;
+    return;
+  }
+  roomShareVisible.value = true;
+};
+
+const handleOpenUserPicker = async () => {
+  await openDialogAfterCloseDropdown('userPicker');
+};
+
+const handleOpenRoomShare = async () => {
+  await openDialogAfterCloseDropdown('roomShare');
+};
+
+const handleUserPickerConfirm = async () => {
+  try {
+    const selectedUsers = userPickerRef.value.getSelectedItems();
+    if (selectedUsers.length === 0) {
+      TUIToast.error({ message: t('Invite.PleaseSelectUser') });
+      return;
+    }
+    await callUserToRoom({
+      roomId: currentRoom.value?.roomId,
+      userIdList: selectedUsers.map((item: any) => item.key),
+      timeout: 60,
+    });
+    userPickerVisible.value = false;
+    TUIToast.success({ message: t('Invite.InviteSuccess') });
+  } catch (error) {
+    console.error('Failed to invite users to room:', error);
+    TUIToast.error({ message: t('Invite.InviteFailed') });
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+
+  .control-title {
+    text-align: center;
+    font-family: "PingFang SC";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+  }
+}
+
+.operate-list {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  white-space: nowrap;
+  color: var(--text-color-primary);
+
+  .operate-item {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    color: var(--text-color-primary);
+    cursor: pointer;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--button-color-secondary-hover);
+    }
+
+    .operate-item-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      line-height: 20px;
+    }
+  }
+}
+
+.room-user-picker {
+  height: 400px;
+  width: 600px;
+}
+
+.user-picker-footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+</style>

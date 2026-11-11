@@ -1,0 +1,43 @@
+{
+  "name": "rtc-kede",
+  "version": "6.1.0",
+  "scripts": {
+    "dev": "vite --force --port 9391",
+    "dev:deep": "vite --port 9391",
+    "build": "vite build",
+    "preview": "vite preview --port 9391",
+    "lint": "./node_modules/.bin/eslint ./src --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@tencentcloud/chat-uikit-engine-lite": "^1.0.7",
+    "@tencentcloud/roomkit-web-vue3": "^6.1.8",
+    "@tencentcloud/tui-core-lite": "^1.0.1",
+    "@tencentcloud/tuiroom-engine-js": "^4.2.4",
+    "@tencentcloud/uikit-base-component-vue3": "1.4.9",
+    "@tencentcloud/uikit-base-widget-vue3": "1.1.3",
+    "@tencentcloud/universal-api": "^2.4.0",
+    "pinia": "^4.0.3",
+    "tuikit-atomicx-vue3": "6.5.3",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14",
+    "vue3-touch-events": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tencentcloud/eslint-config-hybrid": "~0.0.1",
+    "@types/events": "^3.0.0",
+    "@types/node": "^18.19.31",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-legacy": "^5.4.3",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "sass": "^1.50.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.5.4",
+    "vite": "^5.2.8",
+    "vue-tsc": "^0.35.2"
+  },
+  "private": true,
+  "description": "科德渔业专家会议（TUIRoomKit / TRTC），主仓库子项目"
+}

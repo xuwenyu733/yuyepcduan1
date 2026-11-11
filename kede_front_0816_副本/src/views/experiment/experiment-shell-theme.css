@@ -1,0 +1,283 @@
+/* 实验模块壳层主题：统一深色平台风格 */
+.experiment-native {
+  --exp-bg: #0a1520;
+  --exp-panel: #0f1a26;
+  --exp-panel-2: #122030;
+  --exp-border: rgba(124, 143, 161, 0.18);
+  --exp-border-strong: rgba(64, 158, 255, 0.35);
+  --exp-text: rgba(255, 255, 255, 0.88);
+  --exp-text-muted: #7c8fa1;
+  --exp-primary: #409eff;
+  color: var(--exp-text);
+}
+
+/* 新功能页（模板/权限）浅色卡片 → 深色面板 */
+.experiment-native .page-card {
+  background: var(--exp-panel) !important;
+  border: 1px solid var(--exp-border) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  padding: 18px 20px !important;
+}
+
+.experiment-native .section-title {
+  color: var(--exp-text) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+}
+
+.experiment-native .type-card,
+.experiment-native .template-item,
+.experiment-native .role-item,
+.experiment-native .user-row,
+.experiment-native .log-item {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--exp-border) !important;
+  color: var(--exp-text) !important;
+}
+
+.experiment-native .type-card:hover,
+.experiment-native .type-card.active {
+  border-color: var(--exp-border-strong) !important;
+  background: rgba(64, 158, 255, 0.1) !important;
+}
+
+.experiment-native .tpl-name,
+.experiment-native .tpl-meta,
+.experiment-native .type-label {
+  color: var(--exp-text) !important;
+}
+
+.experiment-native .tpl-meta {
+  color: var(--exp-text-muted) !important;
+}
+
+.experiment-native .el-empty__description {
+  color: var(--exp-text-muted) !important;
+}
+
+/* 表单控件 */
+.experiment-native .el-input__inner,
+.experiment-native .el-textarea__inner,
+.experiment-native .el-select .el-input__inner {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--exp-border) !important;
+  color: var(--exp-text) !important;
+}
+
+.experiment-native .el-input__inner::placeholder,
+.experiment-native .el-textarea__inner::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.experiment-native .el-form-item__label {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+.experiment-native .el-radio-button__inner,
+.experiment-native .el-checkbox__label {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* 表格 */
+.experiment-native .el-table,
+.experiment-native .el-table__expanded-cell {
+  background-color: transparent !important;
+  color: var(--exp-text) !important;
+}
+
+.experiment-native .el-table th.el-table__cell,
+.experiment-native .el-table tr,
+.experiment-native .el-table td.el-table__cell {
+  background-color: transparent !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+  color: var(--exp-text) !important;
+}
+
+.experiment-native .el-table th.el-table__cell {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: var(--exp-text-muted) !important;
+  font-weight: 500;
+}
+
+.experiment-native .el-table--border,
+.experiment-native .el-table--group,
+.experiment-native .el-table--border .el-table__cell {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.experiment-native .el-table::before,
+.experiment-native .el-table--border::after {
+  background-color: transparent !important;
+}
+
+.experiment-native .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background-color: rgba(64, 158, 255, 0.08) !important;
+}
+
+/* 卡片 */
+.experiment-native .el-card {
+  background-color: var(--exp-panel) !important;
+  border: 1px solid var(--exp-border) !important;
+  border-radius: 10px !important;
+  color: var(--exp-text) !important;
+  box-shadow: none !important;
+}
+
+.experiment-native .el-card__header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--exp-text) !important;
+  padding: 14px 18px !important;
+}
+
+.experiment-native .el-card__body {
+  padding: 16px 18px !important;
+}
+
+/* 分页 */
+.experiment-native .el-pagination {
+  color: var(--exp-text-muted) !important;
+}
+
+.experiment-native .el-pagination .btn-prev,
+.experiment-native .el-pagination .btn-next,
+.experiment-native .el-pagination .el-pager li {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.experiment-native .el-pagination .el-pager li.active {
+  background: var(--exp-primary) !important;
+  color: #fff !important;
+}
+
+/* 存塘管理等 admin 表格页 */
+.experiment-native .app-container1 {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.experiment-native .mb8 {
+  margin-bottom: 12px !important;
+}
+
+/* 弹窗深色 */
+.experiment-form-dialog.el-dialog {
+  background: #0f1a26 !important;
+  border: 1px solid rgba(64, 158, 255, 0.28) !important;
+  border-radius: 12px !important;
+}
+
+.experiment-form-dialog .el-dialog__header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 16px 20px 14px !important;
+}
+
+.experiment-form-dialog .el-dialog__title {
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.experiment-form-dialog .el-dialog__headerbtn .el-dialog__close {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.experiment-form-dialog .el-dialog__body {
+  max-height: 70vh;
+  overflow: auto;
+  color: rgba(255, 255, 255, 0.88) !important;
+  padding: 16px 20px 20px !important;
+}
+
+.experiment-form-dialog .el-form-item__label {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.experiment-form-dialog .el-input__inner,
+.experiment-form-dialog .el-textarea__inner,
+.experiment-form-dialog .el-select .el-input__inner,
+.experiment-form-dialog .el-input-number .el-input__inner {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(124, 143, 161, 0.22) !important;
+  color: #fff !important;
+}
+
+/* 数据分析 KPI / 数据分区 — 对齐正式版四色图标块 */
+.experiment-native .stats-cards .stat-card {
+  background: #12202d !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.experiment-native .stats-cards .stat-card .el-card__body {
+  padding: 18px 20px !important;
+}
+
+.experiment-native .stat-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  font-size: 22px !important;
+}
+
+.experiment-native .stat-icon.stat-icon--blue {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+}
+
+.experiment-native .stat-icon.stat-icon--green {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+}
+
+.experiment-native .stat-icon.stat-icon--orange {
+  background: #fff7e6 !important;
+  color: #fa8c16 !important;
+}
+
+.experiment-native .stat-icon.stat-icon--red {
+  background: #fff1f0 !important;
+  color: #f5222d !important;
+}
+
+.experiment-native .stat-card .stat-content .stat-value {
+  color: #ffffff !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+
+.experiment-native .stat-card .stat-content .stat-label {
+  color: #8b9aab !important;
+  font-size: 13px !important;
+}
+
+.experiment-native .card-header,
+.experiment-native .panel-title {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.experiment-native .data-analytics .panel-card {
+  background: #12202d !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+}
+
+/* 模板详情弹窗 */
+.template-detail-dialog.el-dialog {
+  background: #0f1a26 !important;
+  border: 1px solid rgba(64, 158, 255, 0.28) !important;
+  border-radius: 12px !important;
+}
+
+.template-detail-dialog .el-dialog__header,
+.template-detail-dialog .el-dialog__body {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.template-detail-dialog .el-dialog__headerbtn .el-dialog__close {
+  color: rgba(255, 255, 255, 0.55) !important;
+}

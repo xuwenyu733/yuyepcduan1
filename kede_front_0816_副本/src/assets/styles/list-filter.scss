@@ -1,0 +1,135 @@
+/**
+ * 常规数据管理页筛选区 — 对齐正式版（青绿搜索 / 金铜导出 / 圆形工具钮）
+ */
+
+.app-container {
+  // 筛选行（直接子级或 list-filter-panel 内）
+  > .el-form--inline,
+  > .el-form.el-form--inline,
+  .list-filter-panel > .el-form--inline,
+  .list-filter-panel > .el-form.el-form--inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 4px;
+    padding: 2px 0 6px;
+    width: 100%;
+
+    .el-form-item {
+      margin-right: 18px !important;
+      margin-bottom: 10px !important;
+      vertical-align: middle;
+    }
+
+    .el-form-item__label {
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      padding-right: 10px !important;
+    }
+
+    .el-form-item__content {
+      border: none !important;
+      background: transparent !important;
+    }
+
+    .el-input,
+    .el-select {
+      min-width: 160px;
+    }
+
+    .el-date-editor--daterange.el-input__inner,
+    .el-date-editor--daterange {
+      min-width: 240px;
+    }
+
+    .el-form-item.search-btns .el-button + .el-button,
+    .el-form-item:last-child .el-button + .el-button {
+      margin-left: 10px;
+    }
+
+    .el-button--default:not(.el-button--primary):not(.el-button--warning) {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+      border-color: rgba(255, 255, 255, 0.28) !important;
+      color: #eef3fa !important;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.42) !important;
+        color: #ffffff !important;
+      }
+    }
+
+    // 筛选行末尾圆形工具钮（正式版右上角）
+    .list-filter-tools,
+    .top-right-btn.list-filter-tools {
+      margin-left: auto !important;
+      margin-right: 0 !important;
+      margin-bottom: 10px;
+      float: none !important;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  // 操作行：新增 / 导出
+  .list-action-bar,
+  > .el-row.mb8:has(.top-right-btn),
+  > .el-row.mb8.list-action-bar {
+    margin-top: 2px;
+    margin-bottom: 14px !important;
+    min-height: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+
+    > .el-col {
+      float: none;
+      width: auto !important;
+      max-width: none;
+      margin-right: 0;
+      flex: 0 0 auto;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .top-right-btn:not(.list-filter-tools) {
+      float: none;
+      margin-left: auto;
+    }
+  }
+
+  .list-action-bar {
+    .el-button {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+  }
+}
+
+// 右侧圆形工具钮 — 细白描边圆
+.top-right-btn {
+  .el-button.is-circle,
+  .el-button--mini.is-circle {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: none !important;
+
+    &:hover,
+    &:focus {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      border-color: #ffffff !important;
+      color: #ffffff !important;
+    }
+
+    i {
+      font-size: 14px;
+      color: inherit !important;
+    }
+  }
+}

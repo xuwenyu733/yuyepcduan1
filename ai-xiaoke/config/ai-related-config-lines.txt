@@ -1,0 +1,18 @@
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application-local.yaml:10:      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration # 禁用 AI 模块的 Qdrant，手动创建
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application-local.yaml:11:      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration # 禁用 AI 模块的 Milvus，手动创建
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application-local.yaml:213:    cn.iocoder.yudao.module.ai.dal.mysql: debug
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application.yaml:201:        endpoint: https://eastusprejade.openai.azure.com
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application.yaml:268:  #    base-url: https://api.holdai.top/mj-relax/mj
+/Users/mac/Desktop/测试_副本6 2/kd-backend2/yudao-server/src/main/resources/application.yaml:269:      base-url: https://api.holdai.top/mj
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:32:VUE_APP_NUMBER_PERSON = 'https://t3.kdaqua.com/#/16'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:33:VUE_APP_FUNASR_H5 = 'https://t3.kdaqua.com/#/voice2txt'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:35:VUE_APP_FUNASR_ENABLE = false
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:36:VUE_APP_FUNASR_SOCKET = 'wss://lanproxy.kdaqua.com/proxy50000/'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:37:# VUE_APP_FUNASR_H5 = 'http://localhost:4994/#/voice2txt'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.dev:46:VUE_APP_SOCKET_BACE_URL = 'ws://localhost:9091'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:32:VUE_APP_NUMBER_PERSON = 'https://t3.kdaqua.com/#/16'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:33:VUE_APP_FUNASR_H5 = 'https://t3.kdaqua.com/#/voice2txt'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:35:VUE_APP_FUNASR_ENABLE = false
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:36:VUE_APP_FUNASR_SOCKET = 'wss://lanproxy.kdaqua.com/proxy50000/'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:37:# VUE_APP_FUNASR_H5 = 'http://localhost:4994/#/voice2txt'
+/Users/mac/Desktop/测试_副本6 2/kede_front_0816/.env.local:46:VUE_APP_SOCKET_BACE_URL = 'ws://localhost:9091'
