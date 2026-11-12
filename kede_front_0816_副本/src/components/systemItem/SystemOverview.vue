@@ -117,15 +117,22 @@ export default {
       return (this.data.circulationPumps || []).length
     },
     microFilterStatus() {
-      return this.data.microFilter.status
+      const s = this.data.microFilter && this.data.microFilter.status
+      if (s === 'running') return '运行中'
+      if (s === 'stopped') return '已停止'
+      return s || '--'
     },
     avgTemperature() {
-      const total = this.data.fishPonds.reduce((sum, pond) => sum + pond.temperature, 0)
-      return (total / this.data.fishPonds.length).toFixed(1)
+      const ponds = this.data.fishPonds || []
+      const vals = ponds.map((p) => Number(p.temperature)).filter((n) => Number.isFinite(n))
+      if (!vals.length) return '--'
+      return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
     },
     avgPh() {
-      const total = this.data.fishPonds.reduce((sum, pond) => sum + pond.ph, 0)
-      return (total / this.data.fishPonds.length).toFixed(1)
+      const ponds = this.data.fishPonds || []
+      const vals = ponds.map((p) => Number(p.ph)).filter((n) => Number.isFinite(n))
+      if (!vals.length) return '--'
+      return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
     },
     
     // 生物信息卡片相关计算

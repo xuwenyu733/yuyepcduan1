@@ -955,7 +955,7 @@ export default {
         that.full_msg = "";
         // 显示「思考中」气泡，等待回复后隐藏
         this.isModelGen = true;
-        // 发送聊天：优先 DeepSeek（AI 小科 /llm/chat）；失败再回退 Java→Python
+        // 发送聊天：默认原查库模式（Java→Python→MySQL）；VUE_APP_XIAOKE_USE_LLM=true 才走 DeepSeek
         const req = {
           user_id: String(that.userInfo.userId || ""),
           conversation_id: that.uid || "",

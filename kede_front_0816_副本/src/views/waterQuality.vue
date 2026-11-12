@@ -230,6 +230,8 @@
                 <span>pH {{ cardPool.lake_ph }}</span>
                 <span>DO {{ cardPool.lake_do }}</span>
                 <span>T {{ cardPool.lake_temp }}℃</span>
+                <span v-if="cardPool.do_saturation != null">饱和 {{ cardPool.do_saturation }}%</span>
+                <span v-if="cardPool.water_level != null">水位 {{ cardPool.water_level }}</span>
                 <span :class="['tank-status', tankVisualClass || 'ok']">{{ poolStatus(cardPool) }}</span>
               </div>
               <div class="tank-empty" v-else-if="dataLoading">
@@ -510,9 +512,14 @@ export default {
       if (s === "预警") return "warn";
       return "";
     },
-    /** 3D 鱼缸水位：按溶解氧相对正常区间映射，缺省约 62% */
+    /** 3D 鱼缸水位：优先传感器水位，否则按溶氧估 */
     tankFillPct() {
       const pool = this.cardPool || {};
+      const level = Number(pool.water_level);
+      if (Number.isFinite(level) && level > 0) {
+        // lel_level_1 约 60–110，按百分比钳制
+        return Math.round(Math.min(92, Math.max(18, level)));
+      }
       const doVal = Number(pool.lake_do);
       if (!Number.isFinite(doVal) || doVal <= 0) return 62;
       const pct = Math.round(Math.min(88, Math.max(28, (doVal / 10) * 100)));
@@ -573,7 +580,7 @@ export default {
       if (!this._isDestroyed) this.dataLoading = false;
     });
     // 演示：2s；接库 30s。后台标签页暂停轮询，避免切回时定时器堆积把页面卡死
-    this._pollIntervalMs = USE_WATER_QUALITY_DEMO ? 2000 : 30000;
+    this._pollIntervalMs = USE_WATER_QUALITY_DEMO ? 2000 : 5000;
     this.startWaterPolling();
     this.clockTimer = setInterval(this.tickClock, 1000);
     this._onVisibilityChange = () => {
@@ -946,7 +953,7 @@ export default {
     },
     startWaterPolling() {
       if (this.refreshTimer || this._isDestroyed || document.hidden) return;
-      const ms = this._pollIntervalMs || 30000;
+      const ms = this._pollIntervalMs || 5000;
       this.refreshTimer = setInterval(() => {
         if (this._isDestroyed || document.hidden || this._loadInflight) return;
         // 前台轮询用 force，保证实时；有互斥不会叠请求

@@ -137,17 +137,23 @@ export async function chatXiaokeStream(data, opts = {}) {
 }
 
 /**
- * 优先 DeepSeek（小科 /llm）；失败再回退 Java→Python :8000
+ * 默认：原渔业小科查库模式（前端 → Java chatPyStream → Python → MySQL）。
+ * 投喂/鱼池/设备等读已导入库；不每次打开 SQL 文件。
+ * 仅当 VUE_APP_XIAOKE_USE_LLM=true 时才优先 DeepSeek（Skill + 联网三段式）。
  */
 export async function chatAgentStream(data, opts = {}) {
   const { onEvent, signal } = opts || {}
-  try {
-    await chatXiaokeStream(data, { onEvent, signal })
-  } catch (err) {
-    if (signal && signal.aborted) throw err
-    console.warn('[chatAgentStream] DeepSeek 失败，回退 Python 智能体:', err && err.message)
-    await chatPyStream(data, { onEvent, signal })
+  const useLlm = String(process.env.VUE_APP_XIAOKE_USE_LLM || '').toLowerCase() === 'true'
+  if (useLlm) {
+    try {
+      await chatXiaokeStream(data, { onEvent, signal })
+      return
+    } catch (err) {
+      if (signal && signal.aborted) throw err
+      console.warn('[chatAgentStream] DeepSeek 失败，回退 Python 查库智能体:', err && err.message)
+    }
   }
+  await chatPyStream(data, { onEvent, signal })
 }
 
 // 数据录入提交：前端 -> Java -> Python -> Java(业务接口)

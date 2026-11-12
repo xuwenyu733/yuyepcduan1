@@ -118,9 +118,20 @@ function mapToWaterLive(latest) {
   // airC_co2_1 是空气 CO₂（ppm），不要当成水体溶解 CO₂(mg/L)
   const co2 = pickNum(map, ['wq_co2_1', 'do_co2_1'])
   const level1 = pickNum(map, ['lel_level_1'])
+  const level2 = pickNum(map, ['lel_level_2'])
   const airCo2 = pickNum(map, ['airC_co2_1'])
   const airTemp = avgNum(map, ['airT_temp_1', 'airT_temp_2'])
+  const airHum = avgNum(map, ['airT_hum_1', 'airT_hum_2'])
   const lux = pickNum(map, ['airC_lux_1'])
+  const boolOf = (key) => {
+    const row = map[key]
+    if (!row) return null
+    const v = row.value
+    if (typeof v === 'boolean') return v
+    if (v === 'true' || v === 1 || v === '1') return true
+    if (v === 'false' || v === 0 || v === '0') return false
+    return null
+  }
 
   const pools = buildPools(map, { ph, turbidity, orp, co2 })
 
@@ -184,9 +195,24 @@ function mapToWaterLive(latest) {
     extras: {
       airCo2,
       airTemp,
+      airHum,
       lux,
       waterLevel: level1,
-      doSaturation: sat
+      waterLevel2: level2,
+      doSaturation: sat,
+      // 系统示意页设备开关（有实际上报的布尔点）
+      devices: {
+        pump1: boolOf('cvt_sw_1'),
+        pump2: boolOf('cvt_sw_2'),
+        pump1Freq: pickNum(map, ['cvt_freq_1']),
+        pump2Freq: pickNum(map, ['cvt_freq_2']),
+        microFilter: boolOf('ct_out3_1'),
+        aerationFan: boolOf('ct_out4_1'),
+        ventFan: boolOf('ct_out3_2'),
+        co2Strip: boolOf('ct_out6_1'),
+        uv: boolOf('ct_out5_1'),
+        ozone: boolOf('ct_out7_1')
+      }
     },
     rawCount: props.length
   }

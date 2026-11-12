@@ -25,23 +25,27 @@
         <div class="panel-content">
           <div class="data-item">
             <span class="data-label">水温</span>
-            <span class="data-value temp">{{ data.temperature.toFixed(1) }}°C</span>
+            <span class="data-value temp">{{ fmtNum(data.temperature, 1) }}°C</span>
           </div>
           <div class="data-item">
             <span class="data-label">pH值</span>
-            <span class="data-value ph">{{ data.ph.toFixed(1) }}</span>
+            <span class="data-value ph">{{ fmtNum(data.ph, 1) }}</span>
           </div>
           <div class="data-item">
             <span class="data-label">溶解氧</span>
-            <span class="data-value oxygen">{{ data.dissolvedOxygen.toFixed(1) }} mg/L</span>
+            <span class="data-value oxygen">{{ fmtNum(data.dissolvedOxygen, 1) }} mg/L</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">饱和度</span>
+            <span class="data-value oxygen">{{ fmtNum(data.doSaturation, 0) }}%</span>
           </div>
           <div class="data-item">
             <span class="data-label">水位</span>
-            <span class="data-value level">{{ data.waterLevel.toFixed(0) }}%</span>
+            <span class="data-value level">{{ fmtNum(data.waterLevel, 0) }}%</span>
           </div>
           <div class="data-item">
             <span class="data-label">鱼数</span>
-            <span class="data-value fish-count">{{ data.fishCount }} 条</span>
+            <span class="data-value fish-count">{{ data.fishCount != null ? data.fishCount : '--' }} 条</span>
           </div>
         </div>
       </div>
@@ -70,6 +74,13 @@ export default {
       }
     },
   },
+  methods: {
+    fmtNum(v, digits) {
+      const n = Number(v)
+      if (!Number.isFinite(n)) return '--'
+      return Number(n.toFixed(digits))
+    }
+  }
 }
 </script>
 

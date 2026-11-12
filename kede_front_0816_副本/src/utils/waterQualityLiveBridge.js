@@ -319,7 +319,7 @@ function realtimeFromMentougouPools(pools, waterAsOf) {
       created_time: waterAsOf || formatDateTime(new Date()),
       source: 'mentougou-hflrwl'
     }
-    return buildRealtimeRow(
+    const row = buildRealtimeRow(
       {
         lake_name: p.lake_name || p.name || `门头沟${p.idx || i + 1}#`,
         pondDetailNum: p.lake_name || p.name,
@@ -332,6 +332,9 @@ function realtimeFromMentougouPools(pools, waterAsOf) {
       i,
       { exact: true }
     )
+    row.do_saturation = p.do_saturation != null ? p.do_saturation : null
+    row.water_level = p.water_level != null ? p.water_level : null
+    return row
   })
 }
 
@@ -489,8 +492,8 @@ let _wqPromise = null
 let _wqResultCache = null
 let _wqResultAt = 0
 let _wqResultPromise = null
-/** 必须小于页面轮询 30s，否则每隔一次轮询都会吃缓存 */
-const WQ_TTL_MS = 20000
+/** 必须小于页面轮询 5s，否则会连续吃缓存看不到新值 */
+const WQ_TTL_MS = 3000
 /** 首屏先等指标；超时后再多等一轮，避免把空「--」当终态写进长缓存 */
 const WQ_MONITOR_WAIT_MS = 8000
 const WQ_MONITOR_RETRY_MS = 8000

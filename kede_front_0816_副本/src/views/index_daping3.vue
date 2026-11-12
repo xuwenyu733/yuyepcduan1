@@ -925,7 +925,7 @@ export default {
     this.loadAllDashboardData();
     this._dashTimer = setInterval(() => {
       if (!this._isDestroyed) this.loadAllDashboardData();
-    }, 30000);
+    }, 5000);
     window.addEventListener('resize', this.handleResize);
     setTimeout(() => this.handleResize(), 350);
     // 进入总览即预取 3D 静态资源，缩短进入原有数字孪生页后的打开延迟
@@ -1079,7 +1079,7 @@ export default {
     async loadAllDashboardData(force = false) {
       const now = Date.now();
       if (!force && this._dashLoading) return;
-      if (!force && this._lastDashLoad && now - this._lastDashLoad < 30000) return;
+      if (!force && this._lastDashLoad && now - this._lastDashLoad < 5000) return;
       // force 时打断节流：允许覆盖进行中的旧请求结果
       this._dashLoadToken = (this._dashLoadToken || 0) + 1;
       const token = this._dashLoadToken;

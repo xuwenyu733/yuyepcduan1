@@ -1,55 +1,37 @@
 <template>
   <div class="system-show-container">
     <div class="system-content">
-      <!-- 系统头部 -->
       <SystemHeader 
         :system-name="systemData.systemName"
         :last-update="systemData.lastUpdate"
-        @refresh="loadSystemData"
+        @refresh="loadSystemData(true)"
       />
       
-      <!-- 系统概览 -->
       <SystemOverview :data="systemData" />
       
-      <!-- 系统主视图容器 -->
       <div class="system-main-view">
-        <!-- 养鱼池 #1 -->
         <FishPond 
-          :data="systemData.fishPonds[0]" 
-          :position="{ x: 150, y: 250 }" 
+          v-for="(pond, idx) in systemData.fishPonds"
+          :key="pond.id || idx"
+          :data="pond" 
+          :position="pondPositions[idx] || { x: 150 + idx * 300, y: 250 }" 
         />
         
-        <!-- 养鱼池 #2 -->
-        <FishPond 
-          :data="systemData.fishPonds[1]" 
-          :position="{ x: 450, y: 250 }" 
-        />
-        
-        <!-- 养鱼池 #3 -->
-        <FishPond 
-          :data="systemData.fishPonds[2]" 
-          :position="{ x: 750, y: 250 }" 
-        />
-        
-        <!-- 微滤机 -->
         <MicroFilter 
           :data="systemData.microFilter" 
           :position="{ x: 1050, y: 250 }" 
         />
         
-        <!-- 生物池 -->
         <BioFilter 
           :data="systemData.bioFilter" 
           :position="{ x: 1350, y: 250 }" 
         />
         
-        <!-- 加氧曝气系统 -->
         <AerationSystem 
           :data="systemData.aeration" 
           :position="{ x: 1650, y: 250 }" 
         />
         
-        <!-- 管道系统 -->
         <PipeSystem />
       </div>
       <div style="width: 100%;height: 200px;"></div>
@@ -66,6 +48,13 @@ import BioFilter from '@/components/systemItem/BioFilter.vue'
 import AerationSystem from '@/components/systemItem/AerationSystem.vue'
 import WaterPump from '@/components/systemItem/WaterPump.vue'
 import PipeSystem from '@/components/systemItem/PipeSystem.vue'
+import { fishApi } from '@/api/modules'
+
+function onOff(v, fallback = 'stopped') {
+  if (v === true) return 'running'
+  if (v === false) return 'stopped'
+  return fallback
+}
 
 export default {
   name: "SystemShow",
@@ -81,134 +70,151 @@ export default {
   },
   data() {
     return {
+      _pollTimer: null,
+      _loading: false,
+      pondPositions: [
+        { x: 150, y: 250 },
+        { x: 450, y: 250 },
+        { x: 750, y: 250 }
+      ],
       systemData: {
-        systemName: "循环水系统",
+        systemName: "门头沟循环水系统",
         lastUpdate: new Date(),
         fishPonds: [
-          {
-            id: "pond1",
-            name: "养鱼池 #1",
-            temperature: 26.5,
-            ph: 7.2,
-            dissolvedOxygen: 6.8,
-            waterLevel: 85,
-            fishCount: 1200
-          },
-          {
-            id: "pond2",
-            name: "养鱼池 #2",
-            temperature: 26.8,
-            ph: 7.1,
-            dissolvedOxygen: 6.5,
-            waterLevel: 88,
-            fishCount: 1150
-          },
-          {
-            id: "pond3",
-            name: "养鱼池 #3",
-            temperature: 27.1,
-            ph: 7.3,
-            dissolvedOxygen: 6.9,
-            waterLevel: 82,
-            fishCount: 1250
-          }
+          { id: 'pond1', name: '门头沟1#', temperature: null, ph: null, dissolvedOxygen: null, doSaturation: null, waterLevel: null, fishCount: '--' },
+          { id: 'pond2', name: '门头沟2#', temperature: null, ph: null, dissolvedOxygen: null, doSaturation: null, waterLevel: null, fishCount: '--' },
+          { id: 'pond3', name: '门头沟3#', temperature: null, ph: null, dissolvedOxygen: null, doSaturation: null, waterLevel: null, fishCount: '--' }
         ],
         microFilter: {
           id: "microFilter1",
-          status: "running",
-          flowRate: 1200,
-          pressure: 0.3,
-          efficiency: 92.5,
+          status: "stopped",
+          flowRate: 0,
+          pressure: 0,
+          efficiency: 0,
           circulationPumps: [
-            {
-              id: "pump1",
-              status: "running",
-              flowRate: 650,
-              power: 2.1,
-              pressure: 0.25
-            },
-            {
-              id: "pump2",
-              status: "running",
-              flowRate: 550,
-              power: 1.8,
-              pressure: 0.22
-            }
+            { id: "pump1", status: "stopped", flowRate: 0, power: 0, pressure: 0 },
+            { id: "pump2", status: "stopped", flowRate: 0, power: 0, pressure: 0 }
           ]
         },
         bioFilter: {
           id: "bioFilter1",
           status: "running",
-          temperature: 28.2,
-          efficiency: 88.3,
-          bacteriaActivity: 91.2,
-          circulationPump: {
-            id: "pump3",
-            status: "running",
-            flowRate: 1200,
-            power: 3.2,
-            pressure: 0.28
-          }
+          temperature: null,
+          efficiency: 0,
+          bacteriaActivity: 0,
+          circulationPump: { id: "pump3", status: "stopped", flowRate: 0, power: 0, pressure: 0 }
         },
         aeration: {
           id: "aeration1",
-          status: "running",
-          oxygenLevel: 95.7,
-          airFlowRate: 800,
-          power: 4.5,
-          circulationPump: {
-            id: "pump4",
-            status: "running",
-            flowRate: 1200,
-            power: 3.0,
-            pressure: 0.32
-          }
+          status: "stopped",
+          oxygenLevel: null,
+          airFlowRate: 0,
+          power: 0,
+          circulationPump: { id: "pump4", status: "stopped", flowRate: 0, power: 0, pressure: 0 }
         },
-        circulationPumps: [
-          {
-            id: "pump1",
-            status: "running",
-            flowRate: 650,
-            power: 2.1,
-            pressure: 0.25
-          },
-          {
-            id: "pump2",
-            status: "running",
-            flowRate: 550,
-            power: 1.8,
-            pressure: 0.22
-          },
-          {
-            id: "pump3",
-            status: "running",
-            flowRate: 1200,
-            power: 3.2,
-            pressure: 0.28
-          },
-          {
-            id: "pump4",
-            status: "running",
-            flowRate: 1200,
-            power: 3.0,
-            pressure: 0.32
-          }
-        ]
+        circulationPumps: []
       }
     }
   },
   methods: {
-    loadSystemData() {
-      // 模拟加载数据
-      this.systemData.lastUpdate = new Date()
-      console.log('系统数据已刷新')
+    levelToPct(level) {
+      const n = Number(level)
+      if (!Number.isFinite(n) || n <= 0) return null
+      return Math.round(Math.min(100, Math.max(0, n)))
+    },
+    applyMentougouLive(live) {
+      if (!live) return
+      const pools = Array.isArray(live.pools) ? live.pools.slice() : []
+      pools.sort((a, b) => Number(a.idx || 0) - Number(b.idx || 0))
+      const nextPonds = [1, 2, 3].map((idx) => {
+        const p = pools.find((x) => Number(x.idx) === idx) || pools[idx - 1] || {}
+        return {
+          id: `pond${idx}`,
+          name: p.lake_name || p.name || `门头沟${idx}#`,
+          temperature: p.lake_temp != null ? Number(p.lake_temp) : null,
+          ph: p.lake_ph != null ? Number(p.lake_ph) : null,
+          dissolvedOxygen: p.lake_do != null ? Number(p.lake_do) : null,
+          doSaturation: p.do_saturation != null ? Number(p.do_saturation) : null,
+          // 仅 1# 有可靠水位探头；2#/3# 无独立水位时显示 --
+          waterLevel: idx === 1 ? this.levelToPct(p.water_level) : null,
+          fishCount: '--'
+        }
+      })
+      this.systemData.fishPonds = nextPonds
+
+      const extras = live.extras || {}
+      const dev = extras.devices || {}
+      const avgSat = Number(extras.doSaturation)
+      const pump1On = !!dev.pump1
+      const pump2On = !!dev.pump2
+      const freq1 = Number(dev.pump1Freq)
+      const freq2 = Number(dev.pump2Freq)
+
+      this.systemData.microFilter = {
+        ...this.systemData.microFilter,
+        status: onOff(dev.microFilter, this.systemData.microFilter.status),
+        circulationPumps: [
+          {
+            id: 'pump1',
+            status: onOff(dev.pump1),
+            flowRate: pump1On && Number.isFinite(freq1) ? Math.round(freq1 * 15) : 0,
+            power: pump1On ? 2.1 : 0,
+            pressure: pump1On ? 0.25 : 0
+          },
+          {
+            id: 'pump2',
+            status: onOff(dev.pump2),
+            flowRate: pump2On && Number.isFinite(freq2) ? Math.round(freq2 * 15) : 0,
+            power: pump2On ? 1.8 : 0,
+            pressure: pump2On ? 0.22 : 0
+          }
+        ]
+      }
+
+      this.systemData.aeration = {
+        ...this.systemData.aeration,
+        status: onOff(dev.aerationFan, this.systemData.aeration.status),
+        oxygenLevel: Number.isFinite(avgSat) ? avgSat : this.systemData.aeration.oxygenLevel,
+        airFlowRate: dev.aerationFan ? 800 : 0,
+        power: dev.aerationFan ? 4.5 : 0
+      }
+
+      if (extras.airTemp != null) {
+        this.systemData.bioFilter = {
+          ...this.systemData.bioFilter,
+          temperature: Number(extras.airTemp)
+        }
+      }
+
+      this.systemData.circulationPumps = this.systemData.microFilter.circulationPumps
+      const asOf = live.waterAsOf ? new Date(String(live.waterAsOf).replace(/-/g, '/')) : new Date()
+      this.systemData.lastUpdate = Number.isNaN(asOf.getTime()) ? new Date() : asOf
+      this.systemData.systemName = '门头沟循环水系统'
+    },
+    async loadSystemData(force = false) {
+      if (this._loading) return
+      this._loading = true
+      try {
+        const res = await fishApi.getMentougouWaterLive(force ? { force: 1 } : undefined)
+        if (res && Number(res.code) === 0 && res.data) {
+          this.applyMentougouLive(res.data)
+        }
+      } catch (e) {
+        console.warn('[systemShow] mentougou live', e && (e.message || e))
+      } finally {
+        this._loading = false
+      }
     }
   },
   mounted() {
-    // 模拟定期更新数据
-    setInterval(() => {
-      this.loadSystemData()
-    }, 30000) // 每30秒更新一次
+    this.loadSystemData(false)
+    this._pollTimer = setInterval(() => {
+      if (!this._isDestroyed) this.loadSystemData(false)
+    }, 30000)
+  },
+  beforeDestroy() {
+    this._isDestroyed = true
+    if (this._pollTimer) clearInterval(this._pollTimer)
   }
 }
 </script>
@@ -241,7 +247,6 @@ export default {
   overflow: auto;
 }
 
-/* 添加基础的网格背景 */
 .system-main-view::before {
   content: "";
   position: absolute;

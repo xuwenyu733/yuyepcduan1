@@ -11,7 +11,8 @@ const TENANT_ID = String(process.env.HFLRWL_TENANT_ID || '1')
 const DEVICE_ID = String(process.env.HFLRWL_DEVICE_ID || '868898083070563')
 const TIMEOUT_MS = Number(process.env.HFLRWL_TIMEOUT_MS || 12000)
 /** 上游短缓存，避免水质页+大屏同时开着重复打 */
-const LATEST_CACHE_MS = Number(process.env.HFLRWL_LATEST_CACHE_MS || 10000)
+/** 与采样间隔对齐，避免 30s 采一次却每 3s 真打上游 */
+const LATEST_CACHE_MS = Number(process.env.HFLRWL_LATEST_CACHE_MS || 30000)
 const HISTORY_CACHE_MS = Number(process.env.HFLRWL_HISTORY_CACHE_MS || 60000)
 const HISTORY_TIMEOUT_MS = Number(process.env.HFLRWL_HISTORY_TIMEOUT_MS || 20000)
 const HISTORY_CONCURRENCY = Math.max(1, Number(process.env.HFLRWL_HISTORY_CONCURRENCY || 3))

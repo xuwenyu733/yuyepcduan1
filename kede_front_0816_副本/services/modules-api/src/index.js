@@ -126,6 +126,14 @@ async function start() {
     .then(() => runBootstrap('threshold', bootstrapThreshold))
     .then(() => runBootstrap('experiment', bootstrapExperiment))
     .catch((err) => console.error('[modules-api] bootstrap chain', err))
+
+  // 门头沟：5s 拉传感器 → 写 PMIS 实时/历史表 → 大屏/水质读库渲染
+  try {
+    const { startWaterSampler } = require(path.join(fishDir, 'iot', 'waterSampler.js'))
+    startWaterSampler()
+  } catch (err) {
+    console.warn('[modules-api] water sampler skip:', (err && err.message) || err)
+  }
 }
 
 if (require.main === module) {
