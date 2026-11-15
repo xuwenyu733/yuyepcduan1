@@ -14,6 +14,7 @@ const name = process.env.VUE_APP_TITLE || '养殖智慧平台' // 网页标题
 const port = process.env.port || process.env.npm_config_port || 4984 // 端口
 
 module.exports = {
+  parallel: process.env.YUYE_BUILD_WORKERS !== '1',
   publicPath: process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : '/',
   outputDir: 'dist',
   assetsDir: 'static',
@@ -141,7 +142,7 @@ module.exports = {
             }
           },
           extractComments: false,
-          parallel: true
+          parallel: process.env.YUYE_BUILD_WORKERS !== '1'
         })
       ],
     //极致优化 4：重新开启代码分割（禁止使用 splitChunks: false）
@@ -176,6 +177,7 @@ module.exports = {
     }
   },
   chainWebpack(config) {
+    if (process.env.YUYE_LOCAL_PREVIEW === '1') config.plugins.delete('optimize-css')
     config.plugins.delete('preload')
     config.plugins.delete('prefetch')
 

@@ -72,7 +72,7 @@ public class MyIMTAFilter extends ApiRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if(excluedePatterns.contains(EasyRequestUtil.getRequest().getRequestURI())){
+        if(excluedePatterns.contains(servletRequest.getRequestURI()) || isMultipart(servletRequest)){
             filterChain.doFilter( servletRequest, servletResponse);
             return;
         }
@@ -125,6 +125,11 @@ public class MyIMTAFilter extends ApiRequestFilter {
             }
         }
         return false;
+    }
+
+    public static boolean isMultipart(HttpServletRequest request) {
+        String contentType = request.getContentType();
+        return contentType != null && contentType.toLowerCase(java.util.Locale.ROOT).startsWith("multipart/");
     }
 }
 

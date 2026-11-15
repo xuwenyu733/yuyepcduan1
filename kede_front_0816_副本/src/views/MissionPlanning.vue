@@ -16,7 +16,6 @@ import {
   SITE_OPTIONS_CHANGED_EVENT
 } from '@/utils/siteOptions'
 import { USER_SCOPE_CHANGED_EVENT } from '@/utils/deptScope'
-import MyChat from '@/components/MyChat/index'
 import PageLoadingMask from '@/components/PageLoadingMask/index'
 var API_BASE_URL = getWiiduApiBase();
 var REQUEST_TIMEOUT_MS = 25000;
@@ -871,7 +870,7 @@ var PAGE_CONFIG = {
   periods: PERIODS
 }
 export default {
-  components: { MyChat, PageLoadingMask },
+  components: { PageLoadingMask },
   data: function() {
     var today = new Date()
     var start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 9, 0)
@@ -1987,7 +1986,6 @@ export default {
     </div>
 
     <div class="toast" v-if="toastText">{{ toastText }}</div>
-    <MyChat />
   </div>
 </template>
 

@@ -81,20 +81,17 @@
       />
       <IndexDaping1Son v-show="viewMode === 'map'" />
     </main>
-    <MyChat />
   </div>
 </template>
 
 <script>
 import IndexDaping1Son from './index_daping1_son.vue';
 import { digitalTwinBase, prefetchDigitalTwin } from '@/utils/digitalTwin';
-import MyChat from '@/components/MyChat/index';
 
 export default {
   name: 'IndexDaping1SonPage',
   components: {
     IndexDaping1Son,
-    MyChat,
   },
   data() {
     return {

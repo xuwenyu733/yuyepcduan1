@@ -42,8 +42,13 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(MyIMTAFilter.excluedePatterns.contains(EasyRequestUtil.getRequest().getRequestURI()))
+        if(MyIMTAFilter.excluedePatterns.contains(request.getRequestURI()))
             return true;
+        if (MyIMTAFilter.isMultipart(request)) {
+            // Spring owns multipart parsing. Reading it again corrupts uploads or throws.
+            log.info("收到文件上传请求 uri:{}, method:{}, bytes:{}", request.getRequestURI(), request.getMethod(), request.getContentLengthLong());
+            return true;
+        }
         CustomHttpServletRequestWrapper wrapper = new CustomHttpServletRequestWrapper(request);
         Map<String, Object> requestParams = MapUtil.<String, Object>builder()
                 .put("query", JakartaServletUtil.getParamMap(wrapper))
@@ -68,12 +73,11 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        if(MyIMTAFilter.excluedePatterns.contains(EasyRequestUtil.getRequest().getRequestURI()))
+        if(MyIMTAFilter.excluedePatterns.contains(request.getRequestURI()))
             return;
-        CustomHttpServletRequestWrapper wrapper = new CustomHttpServletRequestWrapper(request);
-        String method = wrapper.getMethod();
-        String clientIP = JakartaServletUtil.getClientIP(wrapper);
-        String requestURI = wrapper.getRequestURI();
+        String method = request.getMethod();
+        String clientIP = JakartaServletUtil.getClientIP(request);
+        String requestURI = request.getRequestURI();
         // 请求处理完成后执行，可以记录出参或处理异常
         if (ex == null) {
             log.warn("【收到请求-{}】middle, 请求正常，无异常,ip:{},uri:{},method:{}", TokenUtil.userInfo(), clientIP, requestURI, method);

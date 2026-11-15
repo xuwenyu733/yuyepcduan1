@@ -383,7 +383,7 @@ app.post('/api/devices/:id/action', (req, res) => {
 })
 
 const PORT = Number(process.env.PORT || 8787)
-app.listen(PORT, () => {
+app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
   console.log(`[twin-api] http://127.0.0.1:${PORT}`)
   console.log(`[twin-api] sqlite: ${dbPath}`)
   console.log(`[twin-api] generator every ${INTERVAL_MS}ms`)

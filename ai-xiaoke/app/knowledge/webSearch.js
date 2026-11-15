@@ -64,7 +64,7 @@ function mergeItems(lists, limit = 6) {
       const snip = String(it.snippet || '').trim()
       out.push({
         ...it,
-        snippet: isWeakSnippet(snip) ? `公开资料摘要：${it.title}` : snip.slice(0, 240),
+        snippet: isWeakSnippet(snip) ? '' : snip.slice(0, 240),
       })
       if (out.length >= limit) return out
     }
@@ -78,6 +78,7 @@ async function searchBing(query, key, count = 5) {
   const url = `${endpoint}?q=${encodeURIComponent(query)}&count=${count}&mkt=zh-CN`
   const resp = await fetch(url, {
     headers: { 'Ocp-Apim-Subscription-Key': key },
+    signal: AbortSignal.timeout(12000),
   })
   if (!resp.ok) {
     const text = await resp.text().catch(() => '')
@@ -166,6 +167,10 @@ async function searchSo360(query, limit = 8) {
   })
   if (!resp.ok) throw new Error(`360搜索失败(${resp.status})`)
   const html = await resp.text()
+  return parseSo360Results(html, limit)
+}
+
+export function parseSo360Results(html, limit = 8) {
   const blocks = [...html.matchAll(/<li class="res-list"[\s\S]*?<\/li>/g)]
   const items = []
   for (const m of blocks) {
@@ -175,12 +180,13 @@ async function searchSo360(query, limit = 8) {
     const title = stripTags(titleMatch[2])
     if (!title) continue
     const snipMatch =
-      block.match(/<p class="res-desc"[^>]*>([\s\S]*?)<\/p>/i) ||
-      block.match(/class="res-rich"[^>]*>([\s\S]*?)<\/p>/i)
+      block.match(/<span[^>]*class=["'][^"']*\bres-list-summary\b[^"']*["'][^>]*>([\s\S]*?)<\/span>/i) ||
+      block.match(/<p[^>]*class=["'][^"']*\bres-desc\b[^"']*["'][^>]*>([\s\S]*?)<\/p>/i)
+    const directUrl = block.match(/<h3[\s\S]*?<a[^>]*data-mdurl="([^"]+)"/i)?.[1]
     items.push({
       title,
       snippet: stripTags(snipMatch?.[1] || ''),
-      url: decodeHtml(titleMatch[1]),
+      url: decodeHtml(/^https?:\/\//i.test(directUrl || '') ? directUrl : titleMatch[1]),
       source: '360',
     })
     if (items.length >= limit) break

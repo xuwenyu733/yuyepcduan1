@@ -15,7 +15,6 @@ import {
   inferProductionModule,
   // DEMO_DEVICES, DEMO_FAULT_MONTH, // 已落库，仅注释保留引用说明
 } from '@/utils/deviceDemoData';
-import MyChat from '@/components/MyChat/index';
 import PageLoadingMask from '@/components/PageLoadingMask/index';
 
 function todayIso() {
@@ -74,7 +73,7 @@ function buildTrend(startIso, endIso) {
   return pts;
 }
 export default {
-  components: { MyChat, PageLoadingMask },
+  components: { PageLoadingMask },
   data() {
     return{
       TYPE_LEGEND: TYPE_LEGEND.map(function (t) { return Object.assign({}, t); }),
@@ -2049,7 +2048,6 @@ export default {
         </div>
       </div>
     </div>
-    <MyChat />
   </div>
 </template>
 

@@ -37,6 +37,6 @@ io.on('connection', (socket) => {
   })
 })
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, process.env.HOST || '0.0.0.0', () => {
   console.log(`[socket-server] listening on http://127.0.0.1:${PORT}`)
 })

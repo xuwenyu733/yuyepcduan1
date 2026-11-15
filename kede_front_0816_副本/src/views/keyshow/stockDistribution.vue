@@ -9,7 +9,6 @@
       <h1>存量分布</h1>
     </div>
 
-    <MyChat />
 
     <div v-if="!loading && !fishTreeList.length" class="empty-box">
       <el-empty description="暂无批次存量数据" />
@@ -130,12 +129,10 @@
 
 <script>
 import { getFishBatch } from '@/api/fish/daPing'
-import MyChat from '@/components/MyChat/index'
 import { createTreeConnector, clearTreeConnectors } from '@/utils/treeLineConnector'
 
 export default {
   name: 'StockDistribution',
-  components: { MyChat },
   data() {
     return {
       loading: false,

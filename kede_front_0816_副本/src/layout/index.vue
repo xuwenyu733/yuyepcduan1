@@ -12,7 +12,6 @@
         <settings />
       </right-panel>
     </div>
-    <MyChat />
   </div>
 </template>
 
@@ -22,7 +21,6 @@ import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
 import variables from '@/assets/styles/variables.scss'
-import MyChat from '@/components/MyChat/index'
 
 export default {
   name: 'Layout',
@@ -32,7 +30,6 @@ export default {
     RightPanel,
     Settings,
     Sidebar,
-    MyChat,
     TagsView
   },
   mixins: [ResizeMixin],

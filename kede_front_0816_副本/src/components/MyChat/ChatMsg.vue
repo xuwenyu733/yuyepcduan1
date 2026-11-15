@@ -7,11 +7,14 @@
 					<span v-for="(c, i) in ragChips" :key="'rag'+i" class="rag-chip" :class="c.kind">{{ c.text }}</span>
 				</div>
 				<section class="ans-card skill">
-					<h4>一、企业 Skill 依据</h4>
+					<h4>{{ isDatabaseAnswer ? '一、数据库已有内容' : '一、企业 Skill 依据' }}</h4>
 					<div class="ans-body" v-html="renderLiteMarkdown(sectionSkill || '（本轮未命中本地经验）')"></div>
+					<div v-for="hit in databaseImages" :key="hit.id" class="database-source-images">
+						<small>[{{ hit.citation }}] {{ hit.title }}</small><DatabaseImages :images="hit.images" />
+					</div>
 				</section>
 				<section class="ans-card web">
-					<h4>二、网络检索资料</h4>
+					<h4>二、联网查询相关内容</h4>
 					<ol v-if="webHits.length" class="web-hit-list">
 						<li v-for="(w, wi) in webHits" :key="'web'+wi" class="web-hit">
 							<a v-if="w.url" class="web-hit-title" :href="w.url" target="_blank" rel="noopener noreferrer">{{ w.title || '打开资料' }}</a>
@@ -22,7 +25,7 @@
 					<div v-else class="ans-body" v-html="renderLiteMarkdown(sectionWeb || '（本轮无网络资料）')"></div>
 				</section>
 				<section class="ans-card combined">
-					<h4>三、综合结论</h4>
+					<h4>三、数据库与网络综合总结</h4>
 					<div class="ans-body" v-html="renderLiteMarkdown(sectionCombined || '（生成中…）')"></div>
 				</section>
 			</div>
@@ -74,6 +77,7 @@
 	// import config from '@/config';
 	import ImagePreview from "@/components/ImagePreview";
 	import ChatBiPanel from "@/components/MyChat/ChatBiPanel.vue";
+	import DatabaseImages from './DatabaseImages.vue';
 	import {
 		CURR_DEVICE_TYPE,
 		CURR_DEVICE_TYPE_MOBILE,
@@ -85,6 +89,7 @@
 		components: {
 			ImagePreview,
 			ChatBiPanel,
+			DatabaseImages,
 		},
 		props: {
 			data: { //展示图片最大值
@@ -109,6 +114,8 @@
 			};
 		},
 		computed: {
+			isDatabaseAnswer() { return !!(this.data && this.data.rag && this.data.rag.source === 'database'); },
+			databaseImages() { return this.isDatabaseAnswer ? (this.data.rag.localHits || []).filter(hit => hit.images && hit.images.length) : []; },
 			renderedMsg() {
 				const raw = (this.data && this.data.msg) ? String(this.data.msg) : "";
 				return this.renderLiteMarkdown(raw);
@@ -130,7 +137,7 @@
 			webHits() {
 				const rag = this.data && this.data.rag;
 				const list = (rag && rag.webHits) || [];
-				return list.filter((w) => w && (w.url || w.title || w.snippet));
+				return list.filter((w) => w && (!w.url || /^https?:\/\//i.test(w.url)) && (w.url || w.title || w.snippet));
 			},
 			ragChips() {
 				const chips = [];
@@ -140,7 +147,7 @@
 				}
 				const locals = (rag && rag.localHits) || [];
 				locals.slice(0, 3).forEach((h) => {
-					if (h && h.title) chips.push({ kind: 'local', text: `企业: ${h.title}` });
+					if (h && h.title) chips.push({ kind: 'local', text: `${this.isDatabaseAnswer ? '数据库' : '企业'}: ${h.title}` });
 				});
 				this.webHits.slice(0, 3).forEach((w) => {
 					chips.push({ kind: 'web', text: `联网: ${w.title || '资料'}` });

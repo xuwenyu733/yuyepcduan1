@@ -1,6 +1,7 @@
 <template>
   <div class="chatContainer" :style="`z-index: 1002;`">
-    <div class="chatBtn" @click.stop="openChat">
+    <div class="chatBtn" role="button" tabindex="0" aria-label="打开智慧养殖AI助手"
+      @click.stop="openChat" @keydown.enter.prevent="openChat" @keydown.space.prevent="openChat">
       <div class="ai-assistant-outer">
         <!-- 外层轨道 -->
         <div class="orbital-path">
@@ -123,7 +124,7 @@
               </button>
             </div>
 
-            <div class="chat-content" id="chat-content">
+            <div class="chat-content" id="chat-content" v-show="activeTab !== 'agent' || agentRouteHint !== 'data_entry'">
               <div class="message-group">
                 <div class="message-bubble system" v-if="activeTab == 'agent'">
                   <div class="message-content">
@@ -200,15 +201,18 @@
               </div>
             </div>
 
-            <div class="chat-footer">
+            <SmartEntryPanel ref="smartEntry" v-show="activeTab === 'agent' && agentRouteHint === 'data_entry'"
+              @back="agentRouteHint = 'query_analysis'" @query="querySmartEntry" />
+
+            <div class="chat-footer" :class="{ 'entry-mode-footer': activeTab === 'agent' && agentRouteHint === 'data_entry' }">
               <div class="route-hint-bar" v-if="activeTab === 'agent'">
                 <span class="route-hint-label">
                   意图选择
                   <el-tooltip placement="top" effect="dark" popper-class="route-hint-tooltip">
                     <div slot="content" class="route-hint-tip-content">
                       <p><strong>查询分析</strong>：查询已有数据、统计分析、对比趋势、因果诊断等（只读，不填表）。</p>
-                      <p><strong>录入数据</strong>：新增或补充业务单据，如投放、投喂、死亡、分池、用药等。</p>
-                      <p>发送前请先选择意图；若与输入内容不一致，系统会弹窗请您确认。</p>
+                      <p><strong>录入数据</strong>：在当前助手内上传图片、填写文字，一起保存到数据库。切换查询会保留当前草稿。</p>
+                      <p>查询结果依次展示数据库已有内容、联网资料与综合总结。</p>
                     </div>
                     <i class="el-icon-question route-hint-help-icon"></i>
                   </el-tooltip>
@@ -217,16 +221,18 @@
                   type="button"
                   class="route-hint-btn"
                   :class="{ active: agentRouteHint === 'query_analysis' }"
+                  :aria-pressed="agentRouteHint === 'query_analysis'"
                   @click.stop="agentRouteHint = 'query_analysis'"
                 >查询分析</button>
                 <button
                   type="button"
                   class="route-hint-btn"
                   :class="{ active: agentRouteHint === 'data_entry' }"
-                  @click.stop="agentRouteHint = 'data_entry'"
+                  :aria-pressed="agentRouteHint === 'data_entry'"
+                  @click.stop="openSmartEntry()"
                 >录入数据</button>
               </div>
-              <div class="input-container">
+              <div class="input-container" v-show="activeTab !== 'agent' || agentRouteHint !== 'data_entry'">
                 <textarea id="query_textarea" placeholder="请输入您的渔业相关问题(发送消息enter，换行ctrl+enter)..."
                   v-model="msg"></textarea>
                 <div class="voice-container">
@@ -323,7 +329,8 @@ import {
 import FileBusUpload from "@/components/FileUpload/index3.vue";
 import ChatMsg from '@/components/MyChat/ChatMsg.vue';
 import VideoChat from './VideoChat';
-import { removeToken } from "@/utils/auth";
+import SmartEntryPanel from './SmartEntryPanel.vue';
+import { removeToken, getTenantId } from "@/utils/auth";
 
 export default {
   name: "MyChat",
@@ -363,6 +370,7 @@ export default {
       z_index: 0,
       testMsg: "",
       messageList: [],
+      chatLogCacheKey: '',
       userImg:
         "https://img1.baidu.com/it/u=2368124407,3658744752&fm=253&fmt=auto&app=120&f=JPEG?w=800&h=800",
       aiImg: "@/assets/MyChat/img/ai-head.png",
@@ -435,6 +443,7 @@ export default {
     FileBusUpload,
     ChatMsg,
     VideoChat,
+    SmartEntryPanel,
   },
   computed: {
     show() {
@@ -787,7 +796,7 @@ export default {
       messageList.splice(index, 1, item);
 
       this.messageList = messageList;
-      localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+      this.persistMessages();
       // console.log(`score:${score} 修改评分：${JSON.stringify(this.messageList)}`);
       // return;
       updateChatLog(param).then((response) => {
@@ -863,6 +872,7 @@ export default {
     scrollToBottom() {
       this.$nextTick(function () {
         const chatContainer = document.getElementById('chat-content');
+        if (!chatContainer) return;
         chatContainer.scrollTop = chatContainer.scrollHeight + 555;
         chatContainer.scrollTo(0, chatContainer.scrollHeight + 555);
         console.log(`=================>scrollToBottom:${chatContainer.scrollHeight}`);
@@ -925,6 +935,14 @@ export default {
         return null;
       }
     },
+    openSmartEntry(text) {
+      this.agentRouteHint = 'data_entry';
+      this.$refs.smartEntry.open(typeof text === 'string' ? text : this.msg);
+    },
+    querySmartEntry(title) {
+      this.agentRouteHint = ROUTE_HINT_QUERY;
+      this.sendMsg(title);
+    },
     // 发送消息给智能体
     async sendMsg(paramMsg) {
       let that = this;
@@ -941,12 +959,16 @@ export default {
         }
         let routeHint = this.agentRouteHint;
         if (this.activeTab === "agent") {
-          const resolved = await this.resolveAgentRouteHint(textContent);
+          const resolved = normalizeRouteHint(this.agentRouteHint);
           if (resolved === null) {
             return;
           }
           routeHint = resolved;
           this.agentRouteHint = resolved;
+        }
+        if (routeHint === 'data_entry') {
+          this.openSmartEntry(textContent);
+          return;
         }
         this.pushMessages("user", textContent);
         this.scrollToBottom();
@@ -955,7 +977,7 @@ export default {
         that.full_msg = "";
         // 显示「思考中」气泡，等待回复后隐藏
         this.isModelGen = true;
-        // 发送聊天：默认原查库模式（Java→Python→MySQL）；VUE_APP_XIAOKE_USE_LLM=true 才走 DeepSeek
+        // 查询实际数据库，再联网检索并汇总两类资料。
         const req = {
           user_id: String(that.userInfo.userId || ""),
           conversation_id: that.uid || "",
@@ -1042,7 +1064,7 @@ export default {
           const now = Date.now();
           if (now - lastFlushAt > 300) {
             lastFlushAt = now;
-            localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+            this.persistMessages();
           }
         };
 
@@ -1060,6 +1082,7 @@ export default {
         chatAgentStream(req, {
           signal: controller.signal,
           onEvent: (evt) => {
+            if (this._isDestroyed || this._isBeingDestroyed) return;
             try {
               const e = evt || {};
               if (e.type === "meta") {
@@ -1191,7 +1214,7 @@ export default {
                 }
                 this.isModelGen = false;
                 // 最终答案必须立即落本地缓存，避免仅依赖 flush 节流导致刷新后仍停留在「思考步骤」
-                localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+                this.persistMessages();
                 flush();
               } else {
                 // 兜底：当作增量文本
@@ -1210,16 +1233,27 @@ export default {
           },
         })
           .catch((err) => {
+            if (this._isDestroyed || this._isBeingDestroyed) return;
             console.error("调用智能体流式接口失败:", err);
             const idx = ensureAiBubble("不好意思呢！服务器异常，请稍后再试。");
-            if (this.messageList[idx]) this.messageList[idx].msg = this.messageList[idx].msg || "不好意思呢！服务器异常，请稍后再试。";
-            localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+            const notice = err.name === 'AbortError' ? '本次查询已取消，可重新查询。' : (err.message || "查询服务暂时不可用，请稍后重试。");
+            const item = this.messageList[idx];
+            if (item) {
+              item.msg = notice;
+              if (item.sections) {
+                this.$set(item.sections, 'combined', notice);
+                if (String(item.sections.web || '').includes('正在联网')) this.$set(item.sections, 'web', '联网查询未完成，请重试。');
+                this.$set(item, 'think', notice);
+              }
+            }
+            this.persistMessages();
           })
           .finally(() => {
+            if (this._isDestroyed || this._isBeingDestroyed) return;
             this.isModelGen = false;
             this._chatStreamAbort = null;
             try {
-              localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+              this.persistMessages();
             } catch (e) {
               /* ignore */
             }
@@ -1240,18 +1274,30 @@ export default {
       }
       return t.replace(/\n{3,}/g, "\n\n");
     },
-    // 初始化消息
+    persistMessages() {
+      if (!this.chatLogCacheKey) return;
+      try {
+        // Keep recent chat context; image originals and complete entry records stay in MySQL.
+        localStorage.setItem(this.chatLogCacheKey, JSON.stringify(this.messageList.slice(-40)));
+      } catch (e) {
+        // A full/disabled browser cache must not interrupt database queries or saved records.
+      }
+    },
+    // Only restore this tenant and user's history; legacy unscoped history has no reliable owner.
     initMessages() {
       let that = this;
-      let msgs = localStorage.getItem(ChatLogKey);
+      let msgs = null;
+      try { msgs = localStorage.getItem(this.chatLogCacheKey); } catch (e) { /* cache unavailable */ }
       // console.log(`=====>msgs:`, msgs);
       if (msgs) {
-        let messageList = JSON.parse(msgs);
+        let messageList = [];
+        try { messageList = JSON.parse(msgs); } catch (e) { /* ignore malformed history */ }
+        if (!Array.isArray(messageList)) messageList = [];
         // console.log(`最新msg内容：`, messageList); // != ""
         messageList = messageList
           .filter((item) => {
             // console.log(`===============>item:`, item)；
-            return item && (item.msg && typeof item.msg == 'string' && item.msg.indexOf('502 Bad Gateway') == -1) || (item.think && typeof item.think == 'string');
+            return item && ((item.msg && typeof item.msg == 'string' && item.msg.indexOf('502 Bad Gateway') == -1) || (item.think && typeof item.think == 'string'));
           })
           .map((obj) => {
             if (!obj.askScore) obj.askScore = 1;
@@ -1268,7 +1314,7 @@ export default {
             }
           }
         }
-        setTimeout(() => {
+        this._historyRestoreTimer = setTimeout(() => {
           that.$nextTick(() => {
             that.scrollToBottom();
           });
@@ -1296,7 +1342,7 @@ export default {
       let i1 = { role: role, msg: msg, chatTime: chatTime };
       if (conversationId && (role === "ai" || !role)) i1.conversation_id = conversationId;
       this.messageList.push(i1);
-      localStorage.setItem(ChatLogKey, JSON.stringify(this.messageList));
+      this.persistMessages();
       return this.messageList.length - 1;
     },
     dongtai_func() {
@@ -1326,7 +1372,7 @@ export default {
       });
 
       // 水波纹效果
-      setInterval(createRipple, 3000);
+      this._rippleTimer = setInterval(createRipple, 3000);
 
       // 消息气泡悬停效果
       const messageBubbles = document.querySelectorAll('.message-bubble');
@@ -1683,6 +1729,7 @@ export default {
   },
   mounted() {
     this.userInfo = JSON.parse(localStorage.getItem(UserInfoKey));
+    this.chatLogCacheKey = `${ChatLogKey}:${getTenantId()}:${this.userInfo.userId}`;
     this.group_cacheKey = `${GroupChatLogKey}_${this.userInfo.userId}`;
     this.user_cacheKey = `${UserChatLogKey}_${this.userInfo.userId}`;
     // 初始化消息 单聊、群聊
@@ -1725,9 +1772,8 @@ export default {
         that.jq(".div-textarea").css("width", "100%");
       }
     }
-    (window.onresize = function () {
-      screenFuc();
-    })();
+    this._resizeHandler = screenFuc;
+    window.addEventListener('resize', this._resizeHandler);
     that.jq(".message-num").each(function () {
       var wdNum = that.jq(this).html();
       if (wdNum == "") {
@@ -1762,6 +1808,12 @@ export default {
         });
       });
     });
+  },
+  beforeDestroy() {
+    if (this._chatStreamAbort) this._chatStreamAbort.abort();
+    clearInterval(this._rippleTimer);
+    clearTimeout(this._historyRestoreTimer);
+    if (this._resizeHandler) window.removeEventListener('resize', this._resizeHandler);
   },
 };
 </script>
@@ -2323,9 +2375,14 @@ export default {
 }
 
 .chat-footer {
+  flex-shrink: 0;
   padding: 15px 20px;
   border-top: 1px solid rgba(64, 158, 255, 0.2);
   background: linear-gradient(90deg, rgba(16, 42, 67, 0.8), rgba(27, 65, 112, 0.6));
+}
+
+.entry-mode-footer .route-hint-bar {
+  margin-bottom: 0;
 }
 
 .route-hint-bar {

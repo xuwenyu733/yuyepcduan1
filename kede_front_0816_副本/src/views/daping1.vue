@@ -4,7 +4,6 @@
     <!-- scrolling="no" -->
     <iframe class="iframe" align="center" height="100%" width="100%" :src="iframe_url" frameborder="no" border="0"
       marginwidth="0" marginheight="0"></iframe>
-    <MyChat />
     <!-- 站内信 websocket -->
     <div style="display: none;">
       <notify-message class="right-menu-item hover-effect" />
@@ -15,13 +14,11 @@
 <script>
 import { UserInfoKey, AccessTokenKey, RefreshTokenKey } from "@/utils/constants";
 import { ADMIN_MANYS } from "@/utils/constants";
-import MyChat from '@/components/MyChat/index'
 import NotifyMessage from '@/layout/components/Message/index2.vue';
 
 export default {
   name: "Daping1",
   components: {
-    MyChat,
     NotifyMessage
   },
   data() {

@@ -15,6 +15,7 @@ import {
   saveSkill,
 } from './knowledge/skillsStore.js'
 import { formatWebContext, webSearch } from './knowledge/webSearch.js'
+import { handleDatabaseResearch } from './knowledge/databaseResearch.js'
 
 const COMBINE_SYSTEM = `你是「小科」，智慧养殖 AI 助手。
 你将收到：多轮对话历史、当前用户问题、企业 Skill 摘要、网络检索摘要。
@@ -266,6 +267,11 @@ export function llmProxyPlugin() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url || ''
+
+        if (url === '/llm/database/chat/stream' && req.method === 'POST') {
+          await handleDatabaseResearch(req, res, getConfig())
+          return
+        }
 
         if (url === '/llm/status' && req.method === 'GET') {
           const cfg = getConfig()

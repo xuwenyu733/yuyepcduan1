@@ -107,7 +107,7 @@ async function start() {
   attachChatWebSocket(server)
 
   await new Promise((resolve, reject) => {
-    server.listen(PORT, () => {
+    server.listen(PORT, process.env.HOST || '0.0.0.0', () => {
       console.log(`[modules-api] http://localhost:${PORT}`)
       console.log(`[modules-api] fish       /api/fish/*`)
       console.log(`[modules-api] flavor     /api/flavor/*`)

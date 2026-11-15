@@ -311,14 +311,12 @@
         </div>
       </div>
     </div>
-    <MyChat />
   </div>
 </template>
 
 <script>
 import { EZUIKitPlayer } from "ezuikit-js"
 import service from '@/utils/request'
-import MyChat from '@/components/MyChat/index'
 import { formatWorkshop, formatSystem, workshopsEqual, systemsEqual } from '@/utils/siteNaming'
 import {
   loadSharedSiteOptions as fetchSiteOptions,
@@ -351,7 +349,6 @@ function cameraToScopeRow(camera) {
 
 export default {
   name: "IndexDaping2",
-  components: { MyChat },
   data() {
     return {
       filterWorkshop: 'all',

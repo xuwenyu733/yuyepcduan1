@@ -374,7 +374,6 @@
         </div>
       </div>
     </div>
-    <MyChat />
   </div>
 </template>
 
@@ -382,7 +381,6 @@
 // import $ from "jquery";
 
 import * as echarts from "echarts";
-import MyChat from '@/components/MyChat/index'
 import PageLoadingMask from '@/components/PageLoadingMask/index'
 import { metricStatusByKey, metricCellStyle } from "@/utils/waterMetricStatus";
 import {
@@ -405,7 +403,7 @@ import { fetchWaterQualityLiveData, fetchMentougouHistoryForChart } from '@/util
 export default {
 
   name: "WaterQuality",
-  components: { MyChat, PageLoadingMask },
+  components: { PageLoadingMask },
   data() {
     return {
       METRICS: WATER_QUALITY_METRICS,

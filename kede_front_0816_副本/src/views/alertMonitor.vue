@@ -18,7 +18,6 @@ import {
 } from '@/utils/siteOptions'
 import { USER_SCOPE_CHANGED_EVENT } from '@/utils/deptScope'
 import { clearZkAlarmCache } from '@/utils/zkAlarmShared'
-import MyChat from '@/components/MyChat/index'
 import PageLoadingMask from '@/components/PageLoadingMask/index'
 import * as echarts from "echarts";
 var API_BASE_URL = getWiiduApiBase();
@@ -125,7 +124,7 @@ var PAGE_CONFIG = (function () {
   };
 })();
 export default {
-  components: { MyChat, PageLoadingMask },
+  components: { PageLoadingMask },
   data() {
     return {
       config: PAGE_CONFIG,
@@ -1828,7 +1827,6 @@ export default {
         </div>
       </div>
     </section>
-    <MyChat />
   </div>
 </template>
 
