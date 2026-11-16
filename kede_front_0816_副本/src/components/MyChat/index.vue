@@ -205,14 +205,22 @@
               @back="agentRouteHint = 'query_analysis'" @query="querySmartEntry" />
 
             <div class="chat-footer" :class="{ 'entry-mode-footer': activeTab === 'agent' && agentRouteHint === 'data_entry' }">
+              <div
+                v-if="activeTab === 'agent' && xiaokeOnline === false"
+                class="xiaoke-offline-banner"
+                role="status"
+              >
+                AI小科查询服务未连接（:5190）。录入仍可用；查询分析需先启动 ai-xiaoke。
+                <button type="button" class="xiaoke-retry-btn" @click.stop="checkXiaokeStatus(true)">重试检测</button>
+              </div>
               <div class="route-hint-bar" v-if="activeTab === 'agent'">
                 <span class="route-hint-label">
                   意图选择
                   <el-tooltip placement="top" effect="dark" popper-class="route-hint-tooltip">
                     <div slot="content" class="route-hint-tip-content">
-                      <p><strong>查询分析</strong>：查询已有数据、统计分析、对比趋势、因果诊断等（只读，不填表）。</p>
+                      <p><strong>查询分析</strong>：查库中图文/知识与联网资料，再综合总结（只读，不填表）。</p>
                       <p><strong>录入数据</strong>：在当前助手内上传图片、填写文字，一起保存到数据库。切换查询会保留当前草稿。</p>
-                      <p>查询结果依次展示数据库已有内容、联网资料与综合总结。</p>
+                      <p>查询结果依次展示数据库已有内容、联网资料与综合总结；网络通识不会冒充现场实测。</p>
                     </div>
                     <i class="el-icon-question route-hint-help-icon"></i>
                   </el-tooltip>
@@ -285,7 +293,7 @@ import '@/components/MyChat/js/MyChat.js';
 该模块配置：
 role:   user ai
  */
-import { chatAgentStream } from "@/api/fish/aiAgent";
+import { chatAgentStream, pingXiaokeStatus } from "@/api/fish/aiAgent";
 import {
   ROUTE_HINT_QUERY,
   detectRouteHintConflict,
@@ -388,6 +396,8 @@ export default {
       isMicState: false, // 是否mic
       isMicState_: false, // 是否mic
       isModelGen: false, // 是否模型生成
+      xiaokeOnline: null, // null未知 / true在线 / false离线（:5190）
+      xiaokeStatusTip: '',
       micState: {
         count: 0,
         txt: ''
@@ -850,6 +860,17 @@ export default {
       that.number_phone_flag = false;
       // console.log(`================>number_phone_flag:${that.number_phone_flag}`);
     },
+    async checkXiaokeStatus(forceMsg = false) {
+      const res = await pingXiaokeStatus(2500)
+      this.xiaokeOnline = !!res.ok
+      this.xiaokeStatusTip = res.ok
+        ? (res.data && res.data.demoMode ? '小科在线（未配置模型 Key，综合结论为摘录汇总）' : '小科在线')
+        : '小科离线'
+      if (forceMsg) {
+        if (res.ok) this.$modal.msgSuccess(this.xiaokeStatusTip)
+        else this.$modal.msgWarning('仍未连上 AI小科 :5190，请先启动 ai-xiaoke')
+      }
+    },
     // 打开聊天窗口
     openChat() {
       let that = this;
@@ -861,6 +882,7 @@ export default {
           that.number_phone_flag = true;
           // 还原：打开聊天时默认切回“智能体”页，确保数字人区域可见
           that.activeTab = "agent";
+          that.checkXiaokeStatus(false)
           // console.log(`================>number_phone_flag:${that.number_phone_flag}`);
           that.scrollToBottom();
           setTimeout(() => {
@@ -2383,6 +2405,35 @@ export default {
 
 .entry-mode-footer .route-hint-bar {
   margin-bottom: 0;
+}
+
+.xiaoke-offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 169, 161, 0.45);
+  background: rgba(120, 40, 40, 0.35);
+  color: #ffc9c3;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.xiaoke-retry-btn {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 169, 161, 0.55);
+  background: rgba(80, 30, 30, 0.55);
+  color: #ffe3df;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font: inherit;
+}
+.xiaoke-retry-btn:hover {
+  border-color: #ffb4ac;
+  color: #fff;
 }
 
 .route-hint-bar {

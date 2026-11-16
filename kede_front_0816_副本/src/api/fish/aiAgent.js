@@ -138,18 +138,31 @@ export async function chatXiaokeStream(data, opts = {}) {
 
 /**
  * 数据库优先：Java 校验用户权限并查 MySQL，随后联网检索，最后综合两类证据。
- * 图文录入与查询均走真实数据库；该流程不依赖 Python 智能体。
+ * 依赖本机 AI小科 :5190（/llm/database/chat/stream）；图文入库走 Java，不依赖 Python 智能体。
  */
 export async function chatAgentStream(data, opts = {}) {
   const { onEvent, signal } = opts || {}
-  const response = await fetch('/llm/database/chat/stream', {
-    method: 'POST', signal,
-    headers: { ...getBaseHeader(), 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-    body: JSON.stringify(data)
-  })
+  let response
+  try {
+    response = await fetch('/llm/database/chat/stream', {
+      method: 'POST',
+      signal,
+      headers: { ...getBaseHeader(), 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+      body: JSON.stringify(data)
+    })
+  } catch (err) {
+    if (signal && signal.aborted) throw err
+    throw new Error('AI小科服务未启动或连不上（本机需 :5190）。请先启动 ai-xiaoke，再重试查询。')
+  }
   if (!response.ok) {
     const result = await response.json().catch(() => ({}))
-    throw new Error(result.error || '数据库查询暂时不可用，请稍后重试')
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(result.error || '请先登录后再查询数据库')
+    }
+    if (response.status === 502 || response.status === 504) {
+      throw new Error(result.error || '数据库或综合服务暂时不可用，请稍后重试')
+    }
+    throw new Error(result.error || `数据库查询失败（${response.status}），请稍后重试`)
   }
   let completed = false
   await consumeChatSse(response, event => {
@@ -157,6 +170,26 @@ export async function chatAgentStream(data, opts = {}) {
     if (typeof onEvent === 'function') onEvent(event)
   })
   if (!completed) throw new Error('查询连接中断，结果尚未完成，请重试。')
+}
+
+/** 探测 AI小科代理是否在线（可选，失败不抛错） */
+export async function pingXiaokeStatus(timeoutMs = 2500) {
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null
+  try {
+    const resp = await fetch('/llm/status', {
+      method: 'GET',
+      signal: ctrl ? ctrl.signal : undefined,
+      headers: { Accept: 'application/json' },
+    })
+    if (!resp.ok) return { ok: false, reason: `HTTP ${resp.status}` }
+    const data = await resp.json().catch(() => ({}))
+    return { ok: true, data }
+  } catch (e) {
+    return { ok: false, reason: (e && e.name === 'AbortError') ? 'timeout' : 'offline' }
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
 }
 
 // 数据录入提交：前端 -> Java -> Python -> Java(业务接口)

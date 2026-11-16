@@ -16,6 +16,7 @@ import {
 } from './knowledge/skillsStore.js'
 import { formatWebContext, webSearch } from './knowledge/webSearch.js'
 import { handleDatabaseResearch } from './knowledge/databaseResearch.js'
+import { handleEntryPolish } from './knowledge/entryPolish.js'
 
 const COMBINE_SYSTEM = `你是「小科」，智慧养殖 AI 助手。
 你将收到：多轮对话历史、当前用户问题、企业 Skill 摘要、网络检索摘要。
@@ -273,17 +274,25 @@ export function llmProxyPlugin() {
           return
         }
 
-        if (url === '/llm/status' && req.method === 'GET') {
+        if (url === '/llm/entry/polish' && req.method === 'POST') {
+          await handleEntryPolish(req, res, getConfig())
+          return
+        }
+
+        if ((url === '/llm/status' || url === '/llm/health') && req.method === 'GET') {
           const cfg = getConfig()
           const rules = loadRules()
           res.setHeader('Content-Type', 'application/json;charset=utf-8')
           res.end(
             JSON.stringify({
+              ok: true,
               configured: cfg.configured,
               chatReady: true,
+              databaseChatReady: true,
               demoMode: !cfg.configured,
               model: cfg.model,
               baseUrl: cfg.baseUrl,
+              smartEntryBackend: (process.env.SMART_ENTRY_BACKEND || 'http://127.0.0.1:48181').replace(/\/$/, ''),
               providerHint: cfg.configured
                 ? cfg.baseUrl.includes('deepseek')
                   ? 'DeepSeek'
@@ -297,7 +306,7 @@ export function llmProxyPlugin() {
                 localRules: rules.length,
                 webSearchEnabled: cfg.enableWeb,
                 alwaysWebSearch: cfg.enableWeb,
-                answerFormat: 'skill_then_web_then_combined',
+                answerFormat: 'database_then_web_then_combined',
                 bingConfigured: Boolean((process.env.BING_SEARCH_KEY || '').trim()),
                 localMinScore: cfg.localMinScore,
               },

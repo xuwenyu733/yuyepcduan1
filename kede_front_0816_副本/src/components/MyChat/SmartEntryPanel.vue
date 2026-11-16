@@ -10,13 +10,34 @@
       <div v-show="tab === 'entry'" id="smart-entry-edit" role="tabpanel" aria-labelledby="smart-entry-edit-tab">
         <div class="entry-intro"><i class="el-icon-document-add" /><div><strong>把现场信息，存成可查询的资料</strong><p>在这里填写文字、添加图片，保存后就能在查询分析中找到。</p></div></div>
         <div class="entry-form" @paste="pasteImages">
-          <label class="field-label" for="smart-entry-title">资料标题 <span>必填</span></label>
-          <el-input id="smart-entry-title" v-model="title" @input="draftChanged" placeholder="例如：1号池今日水质与投喂记录" :maxlength="160" show-word-limit :disabled="saving" />
+          <div class="field-label-row">
+            <label class="field-label" for="smart-entry-title">资料标题 <span>必填</span></label>
+          </div>
+          <el-input id="smart-entry-title" v-model="title" @input="draftChanged" placeholder="例如：1号池今日水质与投喂记录" :maxlength="160" show-word-limit :disabled="saving || polishing" />
           <div class="entry-columns">
           <div class="entry-text-column">
-          <label class="field-label" for="smart-entry-content">文字说明 <span>可与图片一起保存</span></label>
+          <div class="field-label-row">
+            <label class="field-label" for="smart-entry-content">文字说明 <span>可与图片一起保存</span></label>
+            <div class="polish-actions">
+              <el-button
+                v-if="polishBackup"
+                type="text"
+                size="mini"
+                :disabled="saving || polishing"
+                @click="undoPolish"
+              >还原原文</el-button>
+              <el-button
+                size="mini"
+                icon="el-icon-magic-stick"
+                :loading="polishing"
+                :disabled="saving || (!title.trim() && !content.trim())"
+                @click="polishEntry"
+              >一键 AI 优化</el-button>
+            </div>
+          </div>
           <el-input id="smart-entry-content" v-model="content" @input="draftChanged" type="textarea" :rows="6" :maxlength="20000" show-word-limit
-            placeholder="填写日期、鱼池、现场情况或需要保存的说明。可同时上传图片。" :disabled="saving" />
+            placeholder="填写日期、鱼池、现场情况或需要保存的说明。口语也没关系，可点「一键 AI 优化」整理成规范记录。" :disabled="saving || polishing" />
+          <p v-if="polishTip" class="polish-tip" role="status">{{ polishTip }}</p>
           </div>
           <div class="entry-image-column">
           <label class="field-label">现场图片 <span>{{ images.length }} / 6 张</span></label>
@@ -32,24 +53,31 @@
           </div>
           </div>
           </div>
-          <p class="entry-help">图片可单独保存。添加文字说明后，更容易通过关键词查询到这条资料。</p>
+          <p class="entry-help">图片可单独保存。文字可先随便写，再用「一键 AI 优化」规范结构与措辞；优化后请核对数值再保存。</p>
           <p v-if="saveError" class="entry-error" role="alert">{{ saveError }}</p>
         </div>
       </div>
       <div v-show="tab === 'records'" id="smart-entry-records" role="tabpanel" aria-labelledby="smart-entry-records-tab">
-        <div class="records-toolbar"><span>本组织共 {{ total }} 条图文资料</span><el-button size="small" icon="el-icon-refresh" @click="loadRecords">刷新</el-button></div>
-        <div v-if="savedId" class="save-success" role="status"><i class="el-icon-success" /> 已保存，记录编号 #{{ savedId }}。文字和图片均已入库。</div>
+        <div class="records-toolbar">
+          <span>本组织共 {{ total }} 条图文资料<span v-if="keyword.trim()"> · 筛选后 {{ filteredRecords.length }} 条</span></span>
+          <div class="records-toolbar-actions">
+            <el-input v-model="keyword" size="small" clearable placeholder="按标题/正文筛选" prefix-icon="el-icon-search" class="records-search" />
+            <el-button size="small" icon="el-icon-refresh" @click="loadRecords">刷新</el-button>
+          </div>
+        </div>
+        <div v-if="savedId" class="save-success" role="status"><i class="el-icon-success" /> 已保存，记录编号 #{{ savedId }}。可点「查询这条资料」，或切回「查询分析」用关键词提问。</div>
         <div v-loading="loading" class="records-list">
           <p v-if="listError" class="entry-error" role="alert">{{ listError }}</p>
           <div v-else-if="!loading && !records.length" class="entry-empty"><i class="el-icon-folder-opened" /><p>还没有录入资料</p><span>保存的文字和图片会出现在这里。</span></div>
-          <article v-for="record in records" :key="record.id" class="saved-record" :data-record-id="record.id">
+          <div v-else-if="!loading && records.length && !filteredRecords.length" class="entry-empty"><i class="el-icon-search" /><p>没有匹配「{{ keyword.trim() }}」的资料</p><span>换个关键词，或清空筛选后再看。</span></div>
+          <article v-for="record in filteredRecords" :key="record.id" class="saved-record" :data-record-id="record.id">
             <div class="record-heading"><h3>{{ record.title }}</h3><el-button type="text" @click="queryRecord(record)">查询这条资料</el-button></div>
-            <small>#{{ record.id }} · {{ (record.createdAt || '').replace('T', ' ') }} · {{ record.images.length }} 张图片</small>
+            <small>#{{ record.id }} · {{ (record.createdAt || '').replace('T', ' ') }} · {{ (record.images && record.images.length) || 0 }} 张图片</small>
             <p class="record-content">{{ record.content || '此记录仅包含图片' }}</p>
             <DatabaseImages :images="record.images" :auto-open="record.id === savedId" />
           </article>
         </div>
-        <el-pagination v-if="total > 10" :current-page.sync="pageNo" :page-size="10" :total="total" layout="prev, pager, next" @current-change="loadRecords" />
+        <el-pagination v-if="total > 10 && !keyword.trim()" :current-page.sync="pageNo" :page-size="10" :total="total" layout="prev, pager, next" @current-change="loadRecords" />
       </div>
     </div>
     <div class="entry-actions">
@@ -59,7 +87,7 @@
   </section>
 </template>
 <script>
-import { saveSmartEntry, listSmartEntries } from '@/api/fish/smartEntry'
+import { saveSmartEntry, listSmartEntries, polishSmartEntry } from '@/api/fish/smartEntry'
 import DatabaseImages from './DatabaseImages.vue'
 function draftId() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -70,15 +98,83 @@ function draftId() {
 export default {
   name: 'SmartEntryPanel', components: { DatabaseImages },
   data: () => ({ tab: 'entry', title: '', content: '', images: [], requestId: draftId(), saving: false,
-    loading: false, records: [], total: 0, pageNo: 1, savedId: null, saveError: '', listError: '' }),
-  beforeDestroy() { this.clearImages() },
+    loading: false, records: [], total: 0, pageNo: 1, savedId: null, saveError: '', listError: '', keyword: '',
+    polishing: false, polishTip: '', polishBackup: null }),
+  computed: {
+    filteredRecords() {
+      const kw = String(this.keyword || '').trim().toLowerCase()
+      const list = Array.isArray(this.records) ? this.records : []
+      if (!kw) return list
+      return list.filter((r) => {
+        const title = String((r && r.title) || '').toLowerCase()
+        const body = String((r && r.content) || '').toLowerCase()
+        const id = String((r && r.id) || '')
+        return title.includes(kw) || body.includes(kw) || id.includes(kw)
+      })
+    }
+  },
+  beforeDestroy() {
+    this.clearImages()
+    if (this._polishAbort) {
+      try { this._polishAbort.abort() } catch (e) { /* ignore */ }
+      this._polishAbort = null
+    }
+  },
   methods: {
     open(text = '') {
       if (!this.content && text) { this.content = text; this.draftChanged() }
       this.tab = 'entry'
     },
     // Keep the same ID for an unchanged retry, but never discard edits after a lost save response.
-    draftChanged() { this.requestId = draftId() },
+    draftChanged() {
+      this.requestId = draftId()
+      // 用户手改后，仍保留「还原」快照，直到再次优化或清空
+      if (this.polishTip && !this.polishing) this.polishTip = ''
+    },
+    async polishEntry() {
+      if (this.polishing || this.saving) return
+      if (!this.title.trim() && !this.content.trim()) {
+        this.$message.warning('请先填写标题或文字说明')
+        return
+      }
+      if (this._polishAbort) {
+        try { this._polishAbort.abort() } catch (e) { /* ignore */ }
+      }
+      this._polishAbort = typeof AbortController !== 'undefined' ? new AbortController() : null
+      this.polishing = true
+      this.polishTip = ''
+      this.saveError = ''
+      const before = { title: this.title, content: this.content }
+      try {
+        const result = await polishSmartEntry(this.title, this.content, this._polishAbort && this._polishAbort.signal)
+        if (!this.polishBackup) this.polishBackup = before
+        this.title = String(result.title != null ? result.title : this.title).slice(0, 160)
+        this.content = String(result.content != null ? result.content : this.content).slice(0, 20000)
+        this.draftChanged()
+        this.polishTip = result.notice || '已完成优化，请核对后保存。'
+        this.$message.success(result.mode === 'model' ? 'AI 优化完成' : '已整理完成')
+      } catch (e) {
+        if (e && e.name === 'AbortError') return
+        const msg = (e && e.message) || '优化失败'
+        if (/Failed to fetch|NetworkError|5190|未启动/i.test(msg)) {
+          this.polishTip = 'AI小科服务未连接（:5190），无法优化。请先启动 ai-xiaoke 后再试。'
+        } else {
+          this.polishTip = msg
+        }
+        this.$message.warning(this.polishTip)
+      } finally {
+        this.polishing = false
+        this._polishAbort = null
+      }
+    },
+    undoPolish() {
+      if (!this.polishBackup) return
+      this.title = this.polishBackup.title
+      this.content = this.polishBackup.content
+      this.polishBackup = null
+      this.polishTip = '已还原为优化前的原文。'
+      this.draftChanged()
+    },
     clearImages() { this.images.forEach(i => URL.revokeObjectURL(i.url)); this.images = [] },
     removeImage(index) { URL.revokeObjectURL(this.images[index].url); this.images.splice(index, 1); this.draftChanged() },
     addImages(files) {
@@ -110,6 +206,7 @@ export default {
         if (result.code !== 0 || !result.data || !result.data.id) throw new Error(result.msg || '未收到入库确认，请重试')
         this.savedId = result.data.id; this.$emit('saved', result.data)
         this.title = ''; this.content = ''; this.clearImages(); this.requestId = draftId()
+        this.polishBackup = null; this.polishTip = ''
         this.pageNo = 1; this.selectTab('records')
       } catch (e) { this.saveError = e.message || '保存失败，文字和图片仍保留在窗口中，可重试。' }
       finally { this.saving = false }
@@ -125,7 +222,12 @@ export default {
       catch (e) { this.listError = '读取已存资料失败，请点击刷新重试。' }
       finally { this.loading = false }
     },
-    queryRecord(record) { this.$emit('query', record.title) }
+    queryRecord(record) {
+      const title = String((record && record.title) || '').trim()
+      const body = String((record && record.content) || '').trim().replace(/\s+/g, ' ')
+      const hint = body ? `${title} ${body.slice(0, 80)}` : title
+      this.$emit('query', hint || title)
+    }
   }
 }
 </script>
@@ -140,9 +242,12 @@ export default {
 .smart-entry-panel .entry-intro strong { font-size: 16px; }
 .smart-entry-panel .entry-intro p { margin: 7px 0 0; color: #b8d4f0; line-height: 1.6; }
 .smart-entry-panel .entry-columns { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(260px,1fr); gap: 20px; }
-.smart-entry-panel .field-label { display: block; margin: 16px 0 9px; font-weight: 600; color: #dfecf6; line-height: 1.6; }
-.smart-entry-panel .entry-form > .field-label:first-child { margin-top: 0; }
+.smart-entry-panel .field-label-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 16px 0 9px; flex-wrap: wrap; }
+.smart-entry-panel .entry-form > .field-label-row:first-child { margin-top: 0; }
+.smart-entry-panel .field-label { display: block; margin: 0; font-weight: 600; color: #dfecf6; line-height: 1.6; }
 .smart-entry-panel .field-label span { color: #9ec5ef; font-weight: normal; font-size: 12px; margin-left: 8px; }
+.smart-entry-panel .polish-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.smart-entry-panel .polish-tip { margin: 8px 0 0; color: #87e2c2; font-size: 12px; line-height: 1.6; }
 .smart-entry-panel .el-input__inner, .smart-entry-panel .el-textarea__inner { background: rgba(30,70,120,.5) !important; border: 1px solid rgba(64,158,255,.35) !important; border-radius: 9px; color: #e6f1ff !important; font-family: inherit; }
 .smart-entry-panel .el-input__inner:focus, .smart-entry-panel .el-textarea__inner:focus { border-color: #64a8ff !important; box-shadow: 0 0 10px rgba(100,168,255,.2); }
 .smart-entry-panel .el-textarea__inner { line-height: 1.7; padding: 12px 15px 26px; resize: vertical; }
@@ -163,6 +268,10 @@ export default {
 .smart-entry-panel .selected-image span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #b8d4f0; }
 .smart-entry-panel .selected-image button { position: absolute; right: 0; top: 0; width: 23px; height: 23px; color: #fff; background: #98445c; border: 0; border-radius: 0 7px 0 7px; cursor: pointer; }
 .smart-entry-panel .entry-actions, .smart-entry-panel .records-toolbar, .smart-entry-panel .record-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.smart-entry-panel .records-toolbar { flex-wrap: wrap; margin-bottom: 4px; }
+.smart-entry-panel .records-toolbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.smart-entry-panel .records-search { width: 220px; }
+.smart-entry-panel .records-search .el-input__inner { height: 32px; line-height: 32px; }
 .smart-entry-panel .entry-actions { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid rgba(64,158,255,.15); }
 .smart-entry-panel .entry-actions > div { display: flex; flex-shrink: 0; }
 .smart-entry-panel .el-button { background: rgba(30,70,120,.4) !important; border-color: rgba(64,158,255,.4) !important; color: #c8e2ff !important; border-radius: 8px; }
